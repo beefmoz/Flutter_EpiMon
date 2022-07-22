@@ -26,8 +26,8 @@ class API_Manager {
         return patient;
       }
     } catch (Exception) {
-      print("Exception: ");
-      print(Exception);
+      // print("Exception: ");
+      // print(Exception);
       return patient;
     }
     return patient;
@@ -46,14 +46,14 @@ class API_Manager {
       if (response.statusCode == 200) {
         var jsonString = response.body;
         var jsonList = json.decode(jsonString);
-        print(jsonString);
+        // print(jsonString);
         //print(jsonList[i]);
         Doctor = DoctorInfo.fromJson(jsonList[i]);
         return Doctor;
       }
     } catch (Exception) {
-      print("Exception: ");
-      print(Exception);
+      // print("Exception: ");
+      // print(Exception);
       return Doctor;
     }
     return Doctor;
@@ -70,13 +70,13 @@ class API_Manager {
       if (response.statusCode == 200) {
         var jsonString = response.body;
         var jsonList = json.decode(jsonString);
-        print(jsonString);
-        print(jsonList[i]);
+        // print(jsonString);
+        // print(jsonList[i]);
         history = PatientInfo.fromJson(jsonList[i]);
         return history;
       }
     } catch (Exception) {
-      print(Exception);
+      // print(Exception);
       return history;
     }
     return history;
@@ -123,7 +123,7 @@ class API_Manager {
       //print(response.statusCode);
       //print(response.body);
       var jsonData = json.decode(response.body);
-      //print(jsonData);
+      // print(jsonData);
       for (var u in jsonData) {
         // print(u);
         History p = History(

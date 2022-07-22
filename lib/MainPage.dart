@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'dart:isolate';
-import 'dart:convert';
+// import 'dart:isolate';
+// import 'dart:convert';
 import 'package:epimon2/Login.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:epimon2/Models/PatientInfo_Class.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart' as ble;
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart' as ser;
 import 'package:epimon2/EpilepsyHistoryList.dart';
 import 'package:epimon2/InfoPage.dart';
 import 'package:epimon2/Models/Caretaker_Class.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'package:flutter_tts/flutter_tts.dart';
 import './SelectBondedDevicePage.dart';
@@ -24,18 +24,100 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:telephony/telephony.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'Calling.dart';
+import 'MainPageConnected_2.dart';
 import 'NavBar.dart';
 
 // import './helpers/LineChart.dart';
+Future<void> init() async {
+  await initializeService();
+}
+
+Future<void> initializeService() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final service = FlutterBackgroundService();
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      // this will executed when app is in foreground or background in separated isolate
+      onStart: onStart,
+
+      // auto start service
+      autoStart: true,
+      isForegroundMode: true,
+    ),
+    iosConfiguration: IosConfiguration(
+      // auto start service
+      autoStart: true,
+
+      // this will executed when app is in foreground in separated isolate
+      onForeground: onStart,
+
+      // you have to enable background fetch capability on xcode project
+      onBackground: onIosBackground,
+    ),
+  );
+}
+
+// to ensure this executed
+// run app from xcode, then from xcode menu, select Simulate Background Fetch
+void onIosBackground() {
+  WidgetsFlutterBinding.ensureInitialized();
+  print('FLUTTER BACKGROUND FETCH');
+}
+
+void onStart() {
+  String hr = '';
+  WidgetsFlutterBinding.ensureInitialized();
+  final service = FlutterBackgroundService();
+
+  service.onDataReceived.listen((event) {
+    if (event!["action"] == "setAsForeground") {
+      // print('setforeground');
+      service.setForegroundMode(true);
+      return;
+    }
+
+    if (event["action"] == "setAsBackground") {
+      service.setForegroundMode(false);
+    }
+
+    if (event["action"] == "stopService") {
+      service.stopBackgroundService();
+    }
+
+    if (event["hr"] != null) {
+      hr = event["hr"];
+    }
+  }
+
+  );
+
+  // bring to foreground
+  service.setForegroundMode(true);
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
+    if (!(await service.isServiceRunning())) timer.cancel();
+    if(hr!='') {
+      service.setNotificationInfo(
+        title: "EpiMon",
+        content: "Heart Rate: " + hr + ' bpm',
+      );
+    }
+    else {
+      service.setNotificationInfo(
+        title: "EpiMon",
+        content: 'Awaiting connection with device...',
+      );
+    }
+  });
+}
 
 class MainPage extends StatefulWidget {
   final String username;
   final int id;
   final int succ;
   final String role;
-  const MainPage({required this.username, required this.role, required this.id, required this.succ});
+  final int conn;
+  final ble.BluetoothDevice? device;
+  const MainPage({required this.username, required this.role, required this.id, required this.succ, required this.conn, required this.device});
   @override
   _MainPage createState() => new _MainPage();
 }
@@ -46,42 +128,11 @@ class _MainPage extends State<MainPage> {
 
   @override
   void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    init();
     super.initState();
     // Get current state
   }
-  
-  //
-  // Future? createIsolate() async{
-  //   final FlutterTts fluttertts = FlutterTts();
-  //   ReceivePort receivePort= ReceivePort();
-  //   Isolate.spawn(isolateFunction, receivePort.sendPort);
-  //
-  //   SendPort childSendPort= await receivePort.first;
-  //
-  //   ReceivePort responsePort = ReceivePort();
-  //   childSendPort.send(['http://randomuser.me/api/', responsePort.sendPort]);
-  //
-  //   var response = await responsePort.first;
-  //   print(response);
-  //   Future.delayed(const Duration(milliseconds: 1500), () async {
-  //   FlutterPhoneDirectCaller.callNumber("+65 91272513");});
-  //   // fluttertts.speak(
-  //   //     "Warning. This person is currently having a seizure. please do the following. 1. Ensure no dangerous objects are near the person. 2. Do not put any objects near the person's mouth. 3. Stay away from the person once first 2 mentioned conditions are met.");
-  // }
-  //
-  // static void isolateFunction(SendPort mainSendPort) async{
-  //     ReceivePort childReceivePort = ReceivePort();
-  //     mainSendPort.send(childReceivePort.sendPort);
-  //
-  //     await for (var message in childReceivePort) {
-  //       String url = message[0];
-  //       SendPort replyPort= message[1];
-  //
-  //       var response = await http.get(Uri.parse(url));
-  //       replyPort.send(json.decode(response.body));
-  //     }
-  //
-  //   }
 
 
   @override
@@ -94,6 +145,17 @@ class _MainPage extends State<MainPage> {
     // if(widget.succ==1) {
     //   showAlertDialog(context);
     // }
+    if (widget.conn==1) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) {
+        return MainPageConnected2(username: widget.username, role: widget.role, id: widget.id, device: widget.device!);
+        // return DeviceScreen(device: r.device);
+      }));
+    }
+    // print('mainpage');
+    // print('setforeground');
+    FlutterBackgroundService()
+        .sendData({"action": "setAsBackground"});
     final Telephony telephony = Telephony.instance;
     final FlutterTts fluttertts = FlutterTts();
     int epi=1;
@@ -103,7 +165,8 @@ class _MainPage extends State<MainPage> {
 
     return WillPopScope(
     onWillPop: () async {
-      SystemNavigator.pop();
+      FlutterForegroundTask.minimizeApp();
+      // Navigator.pop(context, true);
       // showLogoutDialog(context);
       return false;
     },
@@ -130,15 +193,6 @@ class _MainPage extends State<MainPage> {
                   ),
                 )
             ),
-            // Padding(
-            //     padding: EdgeInsets.only(right: 20.0),
-            //     child: GestureDetector(
-            //       onTap: () {},
-            //       child: Icon(
-            //           Icons.more_vert
-            //       ),
-            //     )
-            // ),
           ],
         ),
         body: Container(
@@ -217,36 +271,6 @@ class _MainPage extends State<MainPage> {
                                           //   }
                                           // ),
                                           Divider(),
-                                          // SwitchListTile(
-                                          //   title: const Text('Enable Bluetooth'),
-                                          //   value: _bluetoothState.isEnabled,
-                                          //   onChanged: (bool value) {
-                                          //     // Do the request and update with the true value then
-                                          //     future() async {
-                                          //       checkBluetooth();
-                                          //       // async lambda seems to not working
-                                          //       if (value)
-                                          //         await ser.FlutterBluetoothSerial.instance.requestEnable();
-                                          //       else
-                                          //         await ser.FlutterBluetoothSerial.instance.requestDisable();
-                                          //     }
-                                          //
-                                          //     future().then((_) {
-                                          //       setState(() {});
-                                          //     });
-                                          //   },
-                                          // ),
-                                          // ListTile(
-                                          //   title: const Text('Bluetooth status'),
-                                          //   subtitle: Text(_bluetoothState.toString()),
-                                          //   trailing: ElevatedButton(
-                                          //     child: const Text('Settings'),
-                                          //     onPressed: () {
-                                          //       ser.FlutterBluetoothSerial.instance.openSettings();
-                                          //     },
-                                          //   ),
-                                          // ),
-                                          // Divider(),
                                           Center(
                                             child: ListTile(
                                               title: Text(
@@ -317,25 +341,17 @@ class _MainPage extends State<MainPage> {
                                               child: const Text(
                                                   'Pair with Epilepsy Detector'),
                                               onPressed: () async {
-                                                var blueconn= await Permission.bluetoothConnect.status;
-                                                if (!blueconn.isGranted) {
-                                                  await Permission.bluetoothConnect.request();
-                                                }
-                                                if(blueconn.isGranted) {
-                                                  print('bluetooth perms granted');
                                                   await Navigator.of(context).push(
                                                     MaterialPageRoute(
                                                       builder: (context) {
-                                                        return FlutterBlueApp(
-                                                            username: widget.username,
-                                                            id: widget.id,
+                                                        return FlutterBlueApp(username: widget.username,
                                                             role: widget.role,
+                                                            id: widget.id,
                                                             succ: widget.succ);
                                                       },
                                                     ),
                                                   );
                                                 }
-                                              },
                                             ),
                                           ),
 
@@ -355,9 +371,9 @@ class _MainPage extends State<MainPage> {
                                                   String pname = '';
                                                   if (Caretaker.data == null ||
                                                       p.data == null) {
-                                                    print(
-                                                        Caretaker.error?.toString());
-                                                    print(p.error?.toString());
+                                                    // print(
+                                                    //     Caretaker.error?.toString());
+                                                    // print(p.error?.toString());
                                                     return Container(
                                                       child: Center(
                                                         child: CircularProgressIndicator(),
@@ -467,12 +483,6 @@ class _MainPage extends State<MainPage> {
         )));
 
   }
-  // speak() async {
-  //   FlutterTts fluttertts= new FlutterTts();
-  //   await fluttertts.speak('warning.');
-  //   await fluttertts.awaitSpeakCompletion(true);
-  //   // Future.delayed(const Duration(milliseconds:4000));
-  // }
 
   showLogoutDialog(BuildContext context) {
     // Create button
@@ -536,7 +546,7 @@ class _MainPage extends State<MainPage> {
     }
 
     if(bluestt.isGranted && blueconn.isGranted && bluesc.isGranted) {
-      print('bluetooth perms granted');
+      // print('bluetooth perms granted');
       return;
     }
   }
@@ -549,11 +559,4 @@ class _MainPage extends State<MainPage> {
   }
 
 }
-
-// checklocbg(SendPort s) async {
-//   var location= new loc.Location();
-//   var currcoord= await location!.getLocation();
-//   final List<geo.Placemark> placemarks = await geo.placemarkFromCoordinates(currcoord.latitude!.toDouble(), currcoord.longitude!.toDouble());
-//   s.send(placemarks![0].street);
-// }
 

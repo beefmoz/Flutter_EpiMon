@@ -175,7 +175,7 @@ class CharacteristicTile extends StatelessWidget {
       builder: (c, snapshot) {
         final value = snapshot.data;
         String valuetrue= ascii.decode(snapshot.data!);
-        print(valuetrue);
+        // print(valuetrue);
 
         return ExpansionTile(
           title: ListTile(

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:epimon2/Calling.dart';
-import 'package:epimon2/MainPageConnected.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/MainPageConnected_2.dart';
@@ -103,7 +102,7 @@ class _WarningPageState2 extends State<WarningPage2> {
 
     // widget.server.discoverServices();
 
-    print('at warning page');
+    // print('at warning page');
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -121,7 +120,7 @@ class _WarningPageState2 extends State<WarningPage2> {
                     ),
                   );
                 }
-                // VolumeController().maxVolume();
+                VolumeController().maxVolume();
                 fluttertts.speak(
                     "Warning. This person is currently having a seizure. please do the following. 1. Ensure no dangerous objects are near the person. 2. Do not put any objects near the person's mouth. 3. Stay away from the person once first 2 mentioned conditions are met.");
 
@@ -136,8 +135,8 @@ class _WarningPageState2 extends State<WarningPage2> {
                         hr = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         hrlist.add(hr);
-                        print('wrning');
-                        print(hrlist);
+                        // print('wrning');
+                        // print(hrlist);
                       }
                       // subscriptionhr?.cancel();
                     });
@@ -149,8 +148,8 @@ class _WarningPageState2 extends State<WarningPage2> {
                         str = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         strlist.add(str);
-                        print('wrning');
-                        print(strlist);
+                        // print('wrning');
+                        // print(strlist);
                       }
                       // subscriptionhr?.cancel();
                     });
@@ -246,60 +245,6 @@ class _WarningPageState2 extends State<WarningPage2> {
                             )
                         ),
                         SizedBox(height: 20,),
-                        // ListTile(
-                        //   title: ElevatedButton(
-                        //       child: const Text('Patient has recovered'),
-                        //       onPressed: () {
-                        //         epi=0;
-                        //         subscriptionhr!.cancel();
-                        //         print('leaving warning page');
-                        //         timeend = "'" + DateTime.now().toString() + "'";
-                        //         postData(hrlist, timebegin, timeend);
-                        //         hrlist.clear();
-                        //
-                        //         Navigator.of(context).push(
-                        //           MaterialPageRoute(
-                        //             builder: (context) {
-                        //               return MainPage(
-                        //                   username: widget.username,
-                        //                   role: widget.role,
-                        //                   id: widget.id,
-                        //                   succ:1,
-                        //                 // device: widget.server,
-                        //               );
-                        //             },
-                        //           ),
-                        //         );
-                        //       }),
-                        // ),
-
-                        // ListTile(
-                        //   title: ElevatedButton(
-                        //       child: const Text('to calling'),
-                        //       onPressed: () {
-                        //         subscriptionhr.cancel();
-                        //         print('leaving warning page');
-                        //         timeend = "'" + DateTime.now().toString() + "'";
-                        //         // postData(hrlist, timebegin, timeend);
-                        //         hrlist.clear();
-                        //
-                        //         Navigator.of(context).push(
-                        //           MaterialPageRoute(
-                        //             builder: (context) {
-                        //               return CallingPage(
-                        //                 username: widget.username,
-                        //                 role: widget.role,
-                        //                 id: widget.id,
-                        //                 server: widget.server,
-                        //                 loc: widget.loc,
-                        //                 hrlist: hrlist,
-                        //                 crtkcon: widget.crtkcon
-                        //               );
-                        //             },
-                        //           ),
-                        //         );
-                        //       }),
-                        // ),
                       ]
                   );
                 })

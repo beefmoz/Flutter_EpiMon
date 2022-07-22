@@ -98,19 +98,33 @@ class _NavBar extends State<NavBar> {
                       leading: Icon(Icons.share),
                       title: Text('Connect to EpiDevice'),
                       onTap: () async {
-                        var blueconn = await Permission.bluetoothConnect.status;
-                        if (!blueconn.isGranted) {
-                          await Permission.bluetoothConnect.request();
+                        var blueconn= await Permission.bluetoothConnect.status;
+                        if (blueconn == PermissionStatus.denied) {
+                          blueconn = await Permission.bluetoothConnect.request();
+                          if (blueconn !=  PermissionStatus.granted) {
+                            return;
+                          }
+                          else {
+                            // print('blueconn: ' + blueconn.toString());
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return FlutterBlueApp(username: widget.username,
+                                      role: widget.role,
+                                      id: widget.id,
+                                      succ: 1);
+                                },
+                              ),
+                            );
+                          }
                         }
-                        if (blueconn.isGranted) {
-                          print('bluetooth perms granted');
+                        else {
                           await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) {
-                                return FlutterBlueApp(
-                                    username: widget.username,
-                                    id: widget.id,
+                                return FlutterBlueApp(username: widget.username,
                                     role: widget.role,
+                                    id: widget.id,
                                     succ: 1);
                               },
                             ),
@@ -206,10 +220,10 @@ class _NavBar extends State<NavBar> {
       child: Text("Yes"),
       onPressed: () async{
         await widget.device!.disconnect();
-        Navigator.of(context).push(
+        await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
-              return MainPage(username: widget.username, role: widget.role, id: widget.id, succ: 1);
+              return MainPage(username: widget.username, role: widget.role, id: widget.id, succ: 1, conn: 0, device: null);
             },
           ),
         );
@@ -224,7 +238,7 @@ class _NavBar extends State<NavBar> {
     );
 
     // Create AlertDialog
-    AlertDialog alertLogout = AlertDialog(
+    AlertDialog alertDisc = AlertDialog(
       title: Text("Disconnect from device"),
       content: Text("Do you wish to disconnect?"),
       actions: [
@@ -234,7 +248,7 @@ class _NavBar extends State<NavBar> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alertLogout;
+        return alertDisc;
       },
     );
   }

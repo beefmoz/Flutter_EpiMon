@@ -1,20 +1,13 @@
-// import 'dart:async';
-// import 'dart:convert';
-import 'package:epimon2/Signup_caretaker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:epimon2/BackgroundCollectingTask.dart';
-// import './ChatPage.dart';
-// import './MainPage.dart';
 import './reqloc.dart';
-// import './SelectBondedDevicePage.dart';
+
 import 'package:epimon2/api_manager.dart';
 import 'package:epimon2/Models/Caretaker_Class.dart';
 import 'package:epimon2/Models/PatientInfo_Class.dart';
 import 'package:epimon2/main.dart';
 
-// import 'package:epimon2/Models/EpilepsyHistory_Class.dart';
-// import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'MainPage.dart';
@@ -48,36 +41,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void initState(){
     super.initState();
-    // initSharedPreferences();
   }
-
-  // initSharedPreferences() async{
-  //   WidgetsFlutterBinding.ensureInitialized();
-  //   SharedPreferences preferences= await SharedPreferences.getInstance();
-  //   var user= preferences.getString('user');
-  //   var role= preferences.getString('role');
-  //   var id= preferences.getInt('id');
-  //   // print(user);
-  //   // print(role);
-  //   // print(id);
-  //   // print(user);
-  // }
-  //
-  // checkLoggedIn(BuildContext context) async{
-  //   SharedPreferences preferences= await SharedPreferences.getInstance();
-  //   var user= preferences.getString('user');
-  //   var role= preferences.getString('role');
-  //   var id= preferences.getInt('id');
-  //   if(user!=null && user != '') {
-  //     Navigator.of(context).push(
-  //       MaterialPageRoute(
-  //         builder: (context) {
-  //           return reqloc(username: user, role: role!, id: id!, succ: 1);
-  //         },
-  //       ),
-  //     );
-  //   }
-  // }
   void dispose() {
     // Clean up the controller when the widget is disposed.
     EmailController.dispose();
@@ -110,13 +74,13 @@ class _LoginPageState extends State<LoginPage> {
             child: FutureBuilder<List<PatientInfo>>(
                 future: API_Manager().getPatientsList(),
                 builder: (context, Patients){
-                  print('login');
+                  // print('login');
                   return FutureBuilder<List<CaretakerInfo>>(
                       future: API_Manager().getCaretakersList(),
                       builder: (context, Caretaker) {
                           if (Patients.data == null || Caretaker.data == null) {
-                            print(Patients.error?.toString());
-                            print(Caretaker.error?.toString());
+                            // print(Patients.error?.toString());
+                            // print(Caretaker.error?.toString());
                             return Container(
                               child: Center(child: CircularProgressIndicator(),
                               ),
@@ -342,7 +306,7 @@ showAlertDialog(BuildContext context, int success, String role, String user, int
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) {
-                return MainPage(username: user, role: role, id: id, succ: 1);
+                return MainPage(username: user, role: role, id: id, succ: 1, conn:0, device: null,);
               },
             ),
           );

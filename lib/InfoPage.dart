@@ -1,16 +1,9 @@
-import 'dart:async';
+
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:path/path.dart';
 import 'package:epimon2/Models/Doctors_Class.dart';
 
-import './ChatPage.dart';
-import './SelectBondedDevicePage.dart';
 import 'package:epimon2/api_manager.dart';
-
-import 'package:epimon2/api_manager.dart' as api_manager;
 import 'package:epimon2/Models/PatientInfo_Class.dart';
 import 'package:epimon2/Models/Caretaker_Class.dart';
 import 'Models/Doctors_Class.dart';
@@ -324,7 +317,7 @@ class _InfoPageState extends State<InfoPage> {
                             );
                           });
                     } else if (Caretaker.hasError || Patient.hasError)
-                      print("error patient or doctor");
+                      // print("error patient or doctor");
                     //print(snapshot.error?.toString());
                     print(Patient.error?.toString());
                     return Center(child: CircularProgressIndicator());

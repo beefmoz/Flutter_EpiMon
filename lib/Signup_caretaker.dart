@@ -51,9 +51,9 @@ class _SignupCaretakerPageState extends State<SignupCaretakerPage> {
                       future: API_Manager().getCaretakersList(),
                       builder: (context, snapshot2) {
                         if (snapshot.data == null || snapshot2.data == null) {
-                          print('error: ');
-                          print(snapshot.error?.toString());
-                          print(snapshot2.error?.toString());
+                          // print('error: ');
+                          // print(snapshot.error?.toString());
+                          // print(snapshot2.error?.toString());
                           return Container(
                             padding: EdgeInsets.symmetric(vertical: 40),
                             child: Center(child: CircularProgressIndicator(),
@@ -228,20 +228,20 @@ class _SignupCaretakerPageState extends State<SignupCaretakerPage> {
         else if (patientid==0) {
           jsonString = json.encode(jsonMp2);
         }
-        print('jsonString: ');
-        print(jsonString);
+        // print('jsonString: ');
+        // print(jsonString);
         try {
           var response = await http.post(
               Uri.parse(
                   'http://aspepilepsyproject.atspace.cc/access/addCaretakers.php'),
               body: jsonString
           );
-          print(response.body);
-          print(response.statusCode);
+          // print(response.body);
+          // print(response.statusCode);
         }
         catch (e) {
-          print("Error");
-          print(e);
+          // print("Error");
+          // print(e);
         }
         }
       }

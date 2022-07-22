@@ -4,9 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:epimon2/blewidgets.dart';
-import './MainPageConnected.dart';
 import './MainPageConnected_2.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class FlutterBlueApp extends StatelessWidget {
   final String username;
@@ -71,20 +69,8 @@ class FindDevicesScreen extends StatelessWidget {
   final String role;
   const FindDevicesScreen({required this.username, required this.role, required this.id, required this.succ});
 
-  checkBluetooth() async {
-    var bluesc= await Permission.bluetoothScan.status;
-    print(bluesc);
-
-    // print('dm ' + bluedm.toString());
-
-    if (!bluesc.isGranted) {
-      await Permission.bluetoothScan.request();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    checkBluetooth();
     return Scaffold(
       appBar: AppBar(
         title: Text('Connect to EpiAssistant Device'),
@@ -118,7 +104,7 @@ class FindDevicesScreen extends StatelessWidget {
                                 Navigator.of(context)
                                     .push(MaterialPageRoute(builder: (context) {
                                       // dev.connect();
-                                  return MainPageConnected(username: username, role: role, id: id, device: dev);
+                                  return MainPageConnected2(username: username, role: role, id: id, device: dev);
                                   // return DeviceScreen(device: dev);
                                 })),
                           );
@@ -142,18 +128,10 @@ class FindDevicesScreen extends StatelessWidget {
                       await r.device.connect();
                       await Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
-                            return MainPageConnected(username: username, role: role, id: id, device: r.device);
+                            return MainPageConnected2(username: username, role: role, id: id, device: r.device);
                             // return DeviceScreen(device: r.device);
                           }));
                           },
-                          // print('epipp' + sr.data.toString()),
-                      //     Navigator.of(context).push(
-                      //     MaterialPageRoute(
-                      //         builder: (context) =>
-                      //             MainPageConnected(username: username, role: role, id: id, device: r.device, epi:0)
-                      //       //DeviceScreen(device: d)
-                      //     )
-                      // ),
                     ),
                   )
                       .toList(),

@@ -1,25 +1,9 @@
-import 'dart:async';
+
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart' as ble;
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart' as ser;
-import 'package:scoped_model/scoped_model.dart';
-import 'package:epimon2/EpilepsyHistoryList.dart';
-import 'package:epimon2/InfoPage.dart';
-import 'package:epimon2/Models/Caretaker_Class.dart';
-
-import 'package:epimon2/BackgroundCollectingTask.dart';
-import './SelectBondedDevicePage.dart';
 
 import 'package:location/location.dart' as loc;
-import 'package:geocoding/geocoding.dart' as geo;
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-import 'package:epimon2/api_manager.dart';
 import 'package:epimon2/reqblue.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class reqloc extends StatefulWidget {
   final String username;
@@ -49,7 +33,7 @@ class _reqloc extends State<reqloc> {
     // if (loc.PermissionStatus.granted == true) {
     //
     // }
-    print('reqloc');
+    // print('reqloc');
     return Scaffold(
         appBar: AppBar(
           title: const Text('EpiMon'),
@@ -68,7 +52,7 @@ class _reqloc extends State<reqloc> {
 
   checklocservice() async {
     var serviceEnabled = await location.serviceEnabled();
-    print(serviceEnabled);
+    // print(serviceEnabled);
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
@@ -84,17 +68,32 @@ class _reqloc extends State<reqloc> {
       if (permissionGranted != loc.PermissionStatus.granted) {
         return;
       }
+      else {
+        checklocservice();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return reqblue(username: widget.username,
+                  role: widget.role,
+                  id: widget.id,
+                  succ: widget.succ);
+            },
+          ),
+        );
+      }
     }
-    checklocservice();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return reqblue(username: widget.username,
-              role: widget.role,
-              id: widget.id,
-              succ: widget.succ);
-        },
-      ),
-    );
+    else {
+      checklocservice();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) {
+            return reqblue(username: widget.username,
+                role: widget.role,
+                id: widget.id,
+                succ: widget.succ);
+          },
+        ),
+      );
+    }
   }
 }

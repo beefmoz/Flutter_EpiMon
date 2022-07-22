@@ -77,7 +77,7 @@ class _CallingPageState extends State<CallingPage> {
                 // service.start();
               while(epi==1) {
                 contact= widget.cont.split("");
-                print(contact);
+                // print(contact);
 
                 contactstr= contact.toString().replaceAll(",", ".");
                 // VolumeController().maxVolume();
@@ -105,7 +105,7 @@ class _CallingPageState extends State<CallingPage> {
                         hrlist.add(hr);
                         print('calling');
                       }
-                      print(hrlist);
+                      // print(hrlist);
                     });
 
                 subscriptionstress =
@@ -115,8 +115,8 @@ class _CallingPageState extends State<CallingPage> {
                         str = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         strlist.add(str);
-                        print('wrning');
-                        print(strlist);
+                        // print('wrning');
+                        // print(strlist);
                       }
                       // subscriptionhr?.cancel();
                     });
@@ -182,15 +182,7 @@ class _CallingPageState extends State<CallingPage> {
                           )
                       ),
                       SizedBox(height: 20,),
-                      // ListTile(
-                      //   title: ElevatedButton(
-                      //       child: const Text('call'),
-                      //       onPressed: () async {
-                      //         print(widget.crtkcon);
-                      //         // await FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
-                      //         // await FlutterPhoneDirectCaller.callNumber("+65 67840118");
-                      //       }),
-                      // ),
+
                       ListTile(
                         title: ElevatedButton(
                             child: const Text('Patient has recovered'),
@@ -201,6 +193,7 @@ class _CallingPageState extends State<CallingPage> {
                               timeend = "'" + DateTime.now().toString() + "'";
                               postData(hrlist, strlist, timebegin, timeend);
                               hrlist.clear();
+                              fluttertts.stop();
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) {
@@ -210,7 +203,9 @@ class _CallingPageState extends State<CallingPage> {
                                         username: widget.username,
                                         role: widget.role,
                                         id: widget.id,
-                                        succ: 1
+                                        succ: 1,
+                                        conn: 0,
+                                        device: widget.server!
                                       // device: widget.server,
                                     );
                                   },
@@ -218,55 +213,7 @@ class _CallingPageState extends State<CallingPage> {
                               );
                             }),
                       ),
-
-                      // ListTile(
-                      //   title: ElevatedButton(
-                      //       child: const Text('to warning'),
-                      //       onPressed: () {
-                      //         subscriptionhr.cancel();
-                      //         timeend = "'" + DateTime.now().toString() + "'";
-                      //         // postData(hrlist, timebegin, timeend);
-                      //         hrlist.clear();
-                      //         Navigator.of(context).push(
-                      //           MaterialPageRoute(
-                      //             builder: (context) {
-                      //               return WarningPage2(
-                      //                   username: widget
-                      //                       .username,
-                      //                   role: widget.role,
-                      //                   id: widget.id,
-                      //                   server: widget
-                      //                       .server,
-                      //                   // epi: 1,
-                      //                   loc: widget.loc
-                      //                       .toString(),
-                      //                   // hrlist:[],
-                      //                   crtkcon: widget.crtkcon
-                      //               );
-                      //             },
-                      //           ),
-                      //         );
-                      //       }),
-                      // ),
-                      // ListTile(
-                      //     title: Center(
-                      //         child: Text("This phone is currently contacting an ambulance. If help has yet to arrive within 3 minutes, please help by calling 995.",
-                      //             style: TextStyle(
-                      //                 fontSize: 20,
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.white
-                      //             )
-                      //         )
-                      //     )
-                      // ),
                     ]
-                );
-
-
-                /////////////////////////////
-                return Container(
-                  child: Center(child: CircularProgressIndicator(),
-                  ),
                 );
               }
               return Container(
@@ -280,10 +227,10 @@ class _CallingPageState extends State<CallingPage> {
   }
   postData(List<double> hrlist, List<double> strlist, String timebegin, String timeend)async{ //post dt to server
     //final JSONObject dataJson = new JSONObject();
-    print('hrlist:');
-    print(hrlist);
-    print('strlist:');
-    print(strlist);
+    // print('hrlist:');
+    // print(hrlist);
+    // print('strlist:');
+    // print(strlist);
     double addedHr=0;
     double avgHr=0;
     double addedStr=0;
@@ -314,11 +261,11 @@ class _CallingPageState extends State<CallingPage> {
           Uri.parse('http://aspepilepsyproject.atspace.cc/access/addPlayHistory.php'),
           body: jsonString
       );
-      print(response.body);
-      print(response.statusCode);
+      // print(response.body);
+      // print(response.statusCode);
     } catch(e) {
-      print("Error");
-      print(e);
+      // print("Error");
+      // print(e);
     }
     //await Future.delayed(Duration(milliseconds: 500));
   }

@@ -1,25 +1,25 @@
-import 'package:epimon2/reqmsg.dart';
 import 'package:epimon2/reqnotif.dart';
+import 'package:epimon2/reqphone.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/MainPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class reqphone extends StatefulWidget {
+class reqbluescan extends StatefulWidget {
   final String username;
   final int id;
   final int succ;
   final String role;
-  const reqphone({required this.username, required this.role, required this.id, required this.succ});
+  const reqbluescan({required this.username, required this.role, required this.id, required this.succ});
   @override
-  _reqphone createState() => new _reqphone();
+  _reqbluescan createState() => new _reqbluescan();
 }
 
-class _reqphone extends State<reqphone> {
+class _reqbluescan extends State<reqbluescan> {
 
   @override
   void initState() {
     super.initState();
-    checkPhone();
+    checkBlueScan();
   }
 
   void dispose() {
@@ -31,7 +31,7 @@ class _reqphone extends State<reqphone> {
     // if (loc.PermissionStatus.granted == true) {
     //
     // }
-    // print('reqphone');
+    // print('reqbluescan');
     return Scaffold(
         appBar: AppBar(
           title: const Text('EpiMon'),
@@ -47,25 +47,25 @@ class _reqphone extends State<reqphone> {
         )
     );
   }
-  checkPhone() async {
-    var phoneperm= await Permission.phone.status;
+  checkBlueScan() async {
+    var bluescan= await Permission.bluetoothScan.status;
+    //
+    // print(bluescan);
 
-    // print(phoneperm);
-
-    if (phoneperm ==PermissionStatus.denied) {
-      phoneperm= await Permission.phone.request();
-      if (phoneperm.isGranted == PermissionStatus.denied) {
+    if (bluescan ==PermissionStatus.denied) {
+      bluescan= await Permission.bluetoothScan.request();
+      if (bluescan.isGranted == PermissionStatus.denied) {
         return;
       }
       else {
-        // print('phoneperm: ' + phoneperm.toString());
+        // print('bluescan: ' + bluescan.toString());
         await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
-              return reqmsg(username: widget.username,
-                  role: widget.role,
-                  id: widget.id,
-                  succ: widget.succ,
+              return reqphone(username: widget.username,
+                role: widget.role,
+                id: widget.id,
+                succ: widget.succ,
               );
             },
           ),
@@ -76,10 +76,10 @@ class _reqphone extends State<reqphone> {
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {
-            return reqmsg(username: widget.username,
-                role: widget.role,
-                id: widget.id,
-                succ: widget.succ,
+            return reqphone(username: widget.username,
+              role: widget.role,
+              id: widget.id,
+              succ: widget.succ,
             );
           },
         ),

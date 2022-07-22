@@ -12,11 +12,11 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'MainPage.dart';
 
+
 // @dart=2.9
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(MaterialApp(
   debugShowCheckedModeBanner: false,
   home:LandingPage()
@@ -40,17 +40,20 @@ class LandingPage extends StatelessWidget{
   checkLoggedIn(BuildContext context) async{
     SharedPreferences preferences= await SharedPreferences.getInstance();
     var bluestt= await Permission.bluetooth.status;
+    var blueconn= await Permission.bluetoothConnect.status;
+    var bluescn= await Permission.bluetoothScan.status;
     var loc= await Permission.location.status;
     var phone= await Permission.phone.status;
+    var notif= await Permission.systemAlertWindow.status;
     var user= preferences.getString('user');
     var role= preferences.getString('role');
     var id= preferences.getInt('id');
     if(user!=null && user != '') {
-      if(bluestt.isGranted && loc.isGranted && phone.isGranted) {
+      if(bluestt.isGranted && loc.isGranted && phone.isGranted && notif.isGranted && blueconn.isGranted && bluescn.isGranted) {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
-              return MainPage(username: user, role: role!, id: id!, succ: 1);
+              return MainPage(username: user, role: role!, id: id!, succ: 1, conn:0, device: null);
             },
           ),
         );

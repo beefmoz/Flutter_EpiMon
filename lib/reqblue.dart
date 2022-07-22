@@ -1,3 +1,4 @@
+import 'package:epimon2/reqblueconn.dart';
 import 'package:epimon2/reqphone.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/MainPage.dart';
@@ -30,7 +31,7 @@ class _reqblue extends State<reqblue> {
     // if (loc.PermissionStatus.granted == true) {
     //
     // }
-    print('reqblue');
+    // print('reqblue');
     return Scaffold(
         appBar: AppBar(
           title: const Text('EpiMon'),
@@ -48,38 +49,38 @@ class _reqblue extends State<reqblue> {
   }
   checkBluetooth() async {
     var bluestt= await Permission.bluetooth.status;
-    var blueconn= await Permission.bluetoothConnect.status;
-    var bluesc= await Permission.bluetoothScan.status;
-    var bluedm= await Permission.bluetoothAdvertise.status;
 
-    print('dm ' + bluedm.toString());
-    print('stt ' + bluestt.toString());
-    print('conn ' + blueconn.toString());
-    print('scn ' + bluesc.toString());
+    // print('stt ' + bluestt.toString());
 
-    if (!bluestt.isGranted) {
-      await Permission.bluetooth.request();
+    if (bluestt == PermissionStatus.denied) {
+      bluestt = await Permission.bluetooth.request();
+      if (bluestt !=  PermissionStatus.granted) {
+        return;
+      }
+      else {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return reqblueconn(username: widget.username,
+                  role: widget.role,
+                  id: widget.id,
+                  succ: widget.succ);
+            },
+          ),
+        );
+      }
     }
-    // if (!blueconn.isGranted) {
-    //   await Permission.bluetoothConnect.request();
-    // }
-    // if (!bluesc.isGranted) {
-    //   await Permission.bluetoothScan.request();
-    // }
-
-    if(bluestt.isGranted) {
-      Navigator.of(context).push(
+    else {
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {
-            return reqphone(username: widget.username,
+            return reqblueconn(username: widget.username,
                 role: widget.role,
                 id: widget.id,
                 succ: widget.succ);
           },
         ),
       );
-      print('bluetooth perms granted');
-      return;
     }
   }
 }

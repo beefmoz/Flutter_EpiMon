@@ -108,8 +108,8 @@ class _HistoryPageState extends State<HistoryPage> {
                       future: API_Manager().getPatientsList(),
                       builder: (context, patient){
                         if(snapshot.data==null || patient.data==null ) {
-                          print('error: ');
-                          print(snapshot.error?.toString());
+                          // print('error: ');
+                          // print(snapshot.error?.toString());
                           return Container(child: Center(child: CircularProgressIndicator(),
                           ),
                           );
