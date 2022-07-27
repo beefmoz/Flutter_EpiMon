@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/Signup.dart';
 import 'package:epimon2/Signup_caretaker.dart';
-import 'dart:async';
 
 import './Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';

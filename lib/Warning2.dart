@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:epimon2/Calling.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:epimon2/MainPageConnected_2.dart';
-import 'package:epimon2/MainPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -12,7 +10,6 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:volume_controller/volume_controller.dart';
 
-import 'api_manager.dart' as api_manager;
 
 class WarningPage2 extends StatefulWidget {
   final BluetoothDevice? server;

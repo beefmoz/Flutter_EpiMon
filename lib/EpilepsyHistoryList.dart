@@ -1,10 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:epimon2/Models/EpilepsyHistory_Class.dart';
-import 'package:http/http.dart' as http;
 import 'package:epimon2/Models/PatientInfo_Class.dart';
 import 'package:epimon2/api_manager.dart';
 import 'package:intl/intl.dart';

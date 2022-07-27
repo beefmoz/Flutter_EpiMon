@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:isolate';
 
-
 import 'package:epimon2/Models/Caretaker_Class.dart';
-// import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-// import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart' as geo;
 
@@ -15,16 +12,9 @@ import 'package:flutter_blue/flutter_blue.dart' as ble;
 import 'package:epimon2/EpilepsyHistoryList.dart';
 import 'package:epimon2/InfoPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert';
 
 import './Warning2.dart';
-// import 'package:epimon2/Calling.dart';
-
-// import './SelectBondedDevicePage.dart';
-import 'package:http/http.dart' as http;
-//import 'package:url_launcher/url_launcher.dart';
-//
 
 import 'package:telephony/telephony.dart';
 import 'package:epimon2/api_manager.dart';
@@ -34,10 +24,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'Login.dart';
 import 'MainPage.dart';
 import 'NavBar.dart';
-// import 'NotifClass.dart';
 
 ReceivePort? _receivePort;
-// import './helpers/LineChart.dart';
+
 void startCallback() {
   // The setTaskHandler function must be called to handle the task in the background.
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
@@ -548,14 +537,14 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                                 snapshot2.data!)
                                                                 .toString() +
                                                             ' bpm'),
-                                                        trailing: RaisedButton(
-                                                            child: Text('Read heart rate'),
-                                                            color: Colors.black,
-                                                            textColor: Colors.white,
-                                                            onPressed: () async {
-                                                              refresh(snapshotblue.data![2].characteristics[2]);
-                                                            }
-                                                        ),
+                                                        // trailing: RaisedButton(
+                                                        //     child: Text('Read heart rate'),
+                                                        //     color: Colors.black,
+                                                        //     textColor: Colors.white,
+                                                        //     onPressed: () async {
+                                                        //       refresh(snapshotblue.data![2].characteristics[2]);
+                                                        //     }
+                                                        // ),
                                                       );
                                                     }
                                                     else {
@@ -591,22 +580,22 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                         //     ascii.decode(
                                                         //         snapshot3.data!) +
                                                         //     '/100'),
-                                                        trailing: RaisedButton(
-                                                            child: Text(
-                                                                'Read stress level'),
-                                                            color: Colors.black,
-                                                            textColor: Colors.white,
-                                                            onPressed: () async {
-                                                              await snapshotblue
-                                                                  .data![2]
-                                                                  .characteristics[1]
-                                                                  .setNotifyValue(
-                                                                  !snapshotblue
-                                                                      .data![2]
-                                                                      .characteristics[1]
-                                                                      .isNotifying);
-                                                            }
-                                                        ),
+                                                        // trailing: RaisedButton(
+                                                        //     child: Text(
+                                                        //         'Read stress level'),
+                                                        //     color: Colors.black,
+                                                        //     textColor: Colors.white,
+                                                        //     onPressed: () async {
+                                                        //       await snapshotblue
+                                                        //           .data![2]
+                                                        //           .characteristics[1]
+                                                        //           .setNotifyValue(
+                                                        //           !snapshotblue
+                                                        //               .data![2]
+                                                        //               .characteristics[1]
+                                                        //               .isNotifying);
+                                                        //     }
+                                                        // ),
                                                       );
                                                     }
                                                     else {
@@ -643,12 +632,12 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                                     snapshot4.data!)
                                                                     .toString() +
                                                                 ' steps'),
-                                                        trailing: RaisedButton(
-                                                            child: Text('Read steps'),
-                                                            color: Colors.black,
-                                                            textColor: Colors.white,
-                                                            onPressed: () async {refresh(snapshotblue.data![2].characteristics[3]);}
-                                                        ),
+                                                        // trailing: RaisedButton(
+                                                        //     child: Text('Read steps'),
+                                                        //     color: Colors.black,
+                                                        //     textColor: Colors.white,
+                                                        //     onPressed: () async {refresh(snapshotblue.data![2].characteristics[3]);}
+                                                        // ),
                                                       );
                                                     }
                                                     else {

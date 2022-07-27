@@ -1,14 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:epimon2/MainPageConnected_2.dart';
 import 'package:epimon2/MainPage.dart';
-import 'package:epimon2/Warning2.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'dart:async';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:telephony/telephony.dart';
@@ -80,7 +77,8 @@ class _CallingPageState extends State<CallingPage> {
                 // print(contact);
 
                 contactstr= contact.toString().replaceAll(",", ".");
-                // VolumeController().maxVolume();
+                VolumeController().maxVolume();
+                FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
                 String msg= 'There is an emergency at ' + widget.loc.toString() + ', ' + widget.name + 'is having a seizure and is in need of aid. Their contact number is.' + contactstr;
                 speak(msg, epi);
                 if (!snapshot.hasData) {

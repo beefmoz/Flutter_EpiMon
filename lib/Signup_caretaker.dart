@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:epimon2/Models/Caretaker_Class.dart';
@@ -6,7 +5,6 @@ import 'package:epimon2/Models/Caretaker_Class.dart';
 import 'api_manager.dart';
 import 'package:epimon2/Models/PatientInfo_Class.dart';
 
-import 'package:epimon2/Models/EpilepsyHistory_Class.dart';
 import 'package:http/http.dart' as http;
 import 'package:epimon2/Login.dart';
 

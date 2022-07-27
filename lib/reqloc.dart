@@ -1,7 +1,4 @@
-
-
 import 'package:flutter/material.dart';
-
 import 'package:location/location.dart' as loc;
 import 'package:epimon2/reqblue.dart';
 

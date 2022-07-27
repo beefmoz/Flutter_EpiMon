@@ -1,7 +1,5 @@
 import 'package:epimon2/reqblueconn.dart';
-import 'package:epimon2/reqphone.dart';
 import 'package:flutter/material.dart';
-import 'package:epimon2/MainPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class reqblue extends StatefulWidget {
