@@ -19,10 +19,11 @@ class CallingPage extends StatefulWidget {
   final int id;
   final String loc;
   final List<double> hrlist;
+  final List<double> strlist;
   final String crtkcon;
   final String cont;
   // final StreamSubscription<List<int>?> subscription;
-  const CallingPage({required this.server, required this.username, required this.name, required this.role, required this.id, required this.loc, required this.hrlist, required this.crtkcon, required this.cont});
+  const CallingPage({required this.server, required this.username, required this.name, required this.role, required this.id, required this.loc, required this.hrlist, required this.strlist, required this.crtkcon, required this.cont});
   @override
   _CallingPageState createState() => _CallingPageState();
 }
@@ -31,6 +32,8 @@ class _CallingPageState extends State<CallingPage> {
   final Telephony telephony = Telephony.instance;
   StreamSubscription<List<int>?>? subscriptionhr;
   StreamSubscription<List<int>?>? subscriptionstress;
+  StreamSubscription<List<int>?>? subscriptionacc;
+  StreamSubscription<List<int>?>? subscriptiongyro;
   final FlutterTts fluttertts = FlutterTts();
 
   @override
@@ -51,11 +54,19 @@ class _CallingPageState extends State<CallingPage> {
   Widget build(BuildContext context) {
     String? hrstring;
     String? strstring;
+    String? accstring;
+    List acclist= [];
+    String? gyrostring;
+    List gyrolist= [];
     String timebegin= "'" + DateTime.now().toString()+ "'";
     String timeend= "";
     // double Stress= 0.0;
     double hr= 0.0;
     double str= 0.0;
+    String x= '';
+    String y= '';
+    String z= '';
+    String gyromag= '';
     int epi=1;
     List<double> hrlist= [];
     List<double> strlist = [];
@@ -94,6 +105,10 @@ class _CallingPageState extends State<CallingPage> {
                   hrlist.add(widget.hrlist[i]);
                 }
 
+                for (int i = 0; i < widget.strlist.length; i++) {
+                  strlist.add(widget.strlist[i]);
+                }
+
                 subscriptionhr =
                     snapshot.data![2].characteristics[2].value.listen((event) {
                       hrstring = ascii.decode(event).toString();
@@ -101,7 +116,8 @@ class _CallingPageState extends State<CallingPage> {
                         hr = int.parse(hrstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         hrlist.add(hr);
-                        print('calling');
+                        // print('hr');
+                        // print('calling');
                       }
                       // print(hrlist);
                     });
@@ -113,28 +129,42 @@ class _CallingPageState extends State<CallingPage> {
                         str = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         strlist.add(str);
-                        // print('wrning');
+                        // print('str');
                         // print(strlist);
                       }
                       // subscriptionhr?.cancel();
                     });
-                // if(epi==0) {
-                //   Navigator.of(context).push(
-                //     MaterialPageRoute(
-                //       builder: (context) {
-                //         subscriptionhr.cancel();
-                //         return MainPageConnected(
-                //             username: widget.username,
-                //             role: widget.role,
-                //             id: widget.id,
-                //             device: widget.server,
-                //             epi: widget.epi);
-                //       },
-                //     ),
-                //   );
-                // }
 
-                //postData(hrstring);
+                subscriptionacc =
+                    snapshot.data![2].characteristics[4].value.listen((event) {
+                      accstring = ascii.decode(event).toString();
+                      if(accstring!=null) {
+                        acclist= accstring!.split(",");
+                        // print('acclist');
+                        // print(acclist);
+                        x= acclist[0];
+                        y= acclist[1];
+                        z= acclist[2];
+                        // print(x);
+                        // print(y);
+                        // print(z);
+                      }
+                      // subscriptionhr?.cancel();
+                    });
+
+                subscriptiongyro =
+                    snapshot.data![2].characteristics[5].value.listen((event) {
+                      gyrostring = ascii.decode(event).toString();
+                      if(gyrostring!=null) {
+                        gyrolist= gyrostring!.split(",");
+                        gyromag= gyrolist[3];
+                        // print('gyrolst');
+                        // print(gyromag);
+                        // gyrolist.add(int.parse(gyromag).toDouble());
+                      }
+                      // subscriptionhr?.cancel();
+                    });
+
                 return ListView(
                     children: <Widget>[
                       SizedBox(height: 50,),
@@ -188,8 +218,11 @@ class _CallingPageState extends State<CallingPage> {
                               epi = 0;
                               subscriptionhr!.cancel();
                               subscriptionstress!.cancel();
+                              subscriptionacc!.cancel();
+                              subscriptiongyro!.cancel();
+                              snapshot.data![2].characteristics[0].write(utf8.encode('0'));
                               timeend = "'" + DateTime.now().toString() + "'";
-                              postData(hrlist, strlist, timebegin, timeend);
+                              postData(hrlist, strlist, timebegin, timeend, x, y, z, gyromag);
                               hrlist.clear();
                               fluttertts.stop();
                               Navigator.of(context).push(
@@ -197,6 +230,8 @@ class _CallingPageState extends State<CallingPage> {
                                   builder: (context) {
                                     subscriptionhr!.cancel();
                                     subscriptionstress!.cancel();
+                                    subscriptionacc!.cancel();
+                                    subscriptiongyro!.cancel();
                                     return MainPage(
                                         username: widget.username,
                                         role: widget.role,
@@ -223,7 +258,7 @@ class _CallingPageState extends State<CallingPage> {
         )
     );
   }
-  postData(List<double> hrlist, List<double> strlist, String timebegin, String timeend)async{ //post dt to server
+  postData(List<double> hrlist, List<double> strlist, String timebegin, String timeend, String x, String y, String z, String gyro)async{ //post dt to server
     //final JSONObject dataJson = new JSONObject();
     // print('hrlist:');
     // print(hrlist);
@@ -237,19 +272,19 @@ class _CallingPageState extends State<CallingPage> {
       addedHr= addedHr+ hrlist[i];
     }
     for (int y=0; y<strlist.length; y++) {
-      addedStr= addedStr+ hrlist[y];
+      addedStr= addedStr+ strlist[y];
     }
     avgHr= addedHr/hrlist.length;
     avgStr= addedStr/strlist.length;
     Map<String, dynamic> jsonMp= {
       "Stress": avgStr.toString(),
-      "AccelerometerX": "3.10",
-      "AccelerometerY": "2.10",
-      "AccelerometerZ": "4.10",
+      "AccelerometerX": x,
+      "AccelerometerY": y,
+      "AccelerometerZ": z,
       "HeartRate": avgHr.toString(),
       "timestart": timebegin ,
       "timestop": timeend,
-      "Gyroscopic_Changes": "1",
+      "Gyroscopic_Changes": gyro,
       "patient_id": widget.id.toString(),
       "heartrate_history": "'" + hrlist.toString() + "'"
     };

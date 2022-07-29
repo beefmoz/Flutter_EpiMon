@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:epimon2/Calling.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:flutter_blue/flutter_blue.dart';
@@ -45,45 +44,6 @@ class _WarningPageState2 extends State<WarningPage2> {
     subscriptionhr!.cancel();
     subscriptionstress!.cancel();
     // subscriptionacc!.cancel();
-  }
-
-  postData(List<double> hrlist, List<double> strlist,String timebegin, String timeend) async {
-    //post dt to server
-    //final JSONObject dataJson = new JSONObject();
-    print('hrlist:');
-    // print(hrlist);
-    double addedHr = 0;
-    double avgHr = 0;
-    for (int i = 0; i < hrlist.length; i++) {
-      addedHr = addedHr + hrlist[i];
-    }
-    avgHr = addedHr / hrlist.length;
-    Map<String, dynamic> jsonMp = {
-      "Stress": "90",
-      "AccelerometerX": "3.10",
-      "AccelerometerY": "2.10",
-      "AccelerometerZ": "4.10",
-      "HeartRate": avgHr.toString(),
-      "timestart": timebegin,
-      "timestop": timeend,
-      "Gyroscopic_Changes": "0",
-      "patient_id": widget.id.toString(),
-      "heartrate_history": "'" + hrlist.toString() + "'"
-    };
-    String jsonString = json.encode(jsonMp);
-    try {
-      var response = await http.post(
-          Uri.parse(
-              'http://aspepilepsyproject.atspace.cc/access/addPlayHistory.php'),
-          body: jsonString
-      );
-      print(response.body);
-      print(response.statusCode);
-    } catch (e) {
-      print("Error");
-      print(e);
-    }
-    //await Future.delayed(Duration(milliseconds: 500));
   }
 
   Widget build(BuildContext context) {
@@ -129,10 +89,11 @@ class _WarningPageState2 extends State<WarningPage2> {
                     snapshot.data![2].characteristics[2].value.listen((event) {
                       hrstring = ascii.decode(event).toString();
                       if(hrstring!=null) {
-                        hr = int.parse(strstring!).toDouble();
+                        hr = int.parse(hrstring!).toDouble();
                         // List<double> hrlistdouble=[];
                         hrlist.add(hr);
                         // print('wrning');
+                        // print('hr');
                         // print(hrlist);
                       }
                       // subscriptionhr?.cancel();
@@ -167,6 +128,7 @@ class _WarningPageState2 extends State<WarningPage2> {
                               server: widget.server,
                               loc: widget.loc,
                               hrlist: hrlist,
+                              strlist: strlist,
                               crtkcon: widget.crtkcon,
                               cont: widget.cont
                           );
@@ -249,54 +211,3 @@ class _WarningPageState2 extends State<WarningPage2> {
         );
   }
 }
-
-// Future.delayed(const Duration(milliseconds: 22000), () async {
-//   // await subscriptionhr.cancel();
-//   if(isAtWarning==false) {
-//     subscriptionhr.cancel();
-//     Navigator.of(context).push(
-//       MaterialPageRoute(
-//         builder: (context) {
-//           return MainPageConnected(
-//               username: widget.username,
-//               id: widget.id,
-//               role: widget.role,
-//               device: widget.server,
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   isAtWarning= false;
-//   // if (epi == 0) {
-//   //   Navigator.of(context).push(
-//   //     MaterialPageRoute(
-//   //       builder: (context) {
-//   //         return MainPageConnected(
-//   //             username: widget.username,
-//   //             id: widget.id,
-//   //             role: widget.role,
-//   //             device: widget.server,
-//   //             epi: 0
-//   //         );
-//   //       },
-//   //     ),
-//   //   );
-//   // }
-//     subscriptionhr.cancel();
-//     Navigator.of(context).push(
-//       MaterialPageRoute(
-//         builder: (context) {
-//           return CallingPage(username: widget.username,
-//             id: widget.id,
-//             role: widget.role,
-//             server: widget.server,
-//             loc: widget.loc,
-//             hrlist: hrlist,
-//             crtkcon: widget.crtkcon,
-//           );
-//         },
-//       ),
-//     );
-// });

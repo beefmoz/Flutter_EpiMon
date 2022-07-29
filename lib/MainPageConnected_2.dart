@@ -398,6 +398,7 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                             hrstring = ascii.decode(event).toString();
                             try{
                               hr= int.parse(hrstring);
+                              // print(hr);
                               if (hrstring != null || hrstring!=' ') {
                                 FlutterBackgroundService()
                                     .sendData({"hr": hrstring});
@@ -466,12 +467,13 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
 
                                         if(snapshotblue.data != null) {
 
-                                          refreshAll(snapshotblue.data![2]
-                                              .characteristics[2], snapshotblue.data![2]
-                                              .characteristics[1], snapshotblue.data![2]
-                                              .characteristics[3], snapshotblue.data![2]
-                                              .characteristics[4], snapshotblue.data![2]
-                                              .characteristics[0]);
+                                          refreshAll(
+                                              snapshotblue.data![2].characteristics[0],
+                                              snapshotblue.data![2].characteristics[1],
+                                              snapshotblue.data![2].characteristics[2],
+                                              snapshotblue.data![2].characteristics[3],
+                                              snapshotblue.data![2].characteristics[4],
+                                              snapshotblue.data![2].characteristics[5]);
 
                                           return ListView(
                                             children: <Widget>[
@@ -520,11 +522,6 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                           child: CircularProgressIndicator());
                                                     }
                                                     if (snapshot2.data != null) {
-
-                                                      // FlutterBackgroundService()
-                                                      //     .sendData({"hr": ascii.decode(
-                                                      //     snapshot2.data!)
-                                                      //     .toString()});
 
                                                       return ListTile(
                                                         leading: Image.asset(
@@ -689,58 +686,6 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                       );
                                                     }),
                                               ),
-
-                                              // ListTile(
-                                              //   title: ElevatedButton(
-                                              //       child: const Text(
-                                              //           'Simulate attack'),
-                                              //       onPressed: () async {
-                                              //         String emermsg = name +
-                                              //             ' is currently having a stroke at ' +
-                                              //             currloc.toString() +
-                                              //             '. Please remain calm, ' +
-                                              //             crtk +
-                                              //             ", we will monitor the conditions and call for emergency if needed.";
-                                              //
-                                              //         //
-                                              //         // telephony.sendSms(
-                                              //         //     to: crtkcon,
-                                              //         //     message: emermsg
-                                              //         // );
-                                              //         // print('sent msg');
-                                              //         //
-                                              //
-                                              //         print(emermsg);
-                                              //         Navigator.of(context).push(
-                                              //           MaterialPageRoute(
-                                              //             builder: (context) {
-                                              //               return WarningPage2(
-                                              //                   username: widget.username,
-                                              //                   name: name,
-                                              //                   role: widget.role,
-                                              //                   id: widget.id,
-                                              //                   server: widget
-                                              //                       .device,
-                                              //                   // epi: 1,
-                                              //                   loc: currloc
-                                              //                       .toString(),
-                                              //                   // hrlist:[],
-                                              //                   crtkcon: crtkcon,
-                                              //                   cont: cont
-                                              //               );
-                                              //             },
-                                              //           ),
-                                              //         );
-                                              //       }),
-                                              // ),
-                                              // ListTile(
-                                              //   title: ElevatedButton(
-                                              //       child: const Text(
-                                              //           'Start/Stop reading'),
-                                              //       onPressed: () async{
-                                              //
-                                              //       }),
-                                              // ),
                                               Divider(),
                                             ],
                                           );
@@ -769,7 +714,7 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
     await c.read();
     // print (c.read().toString());
   }
-  refreshAll(ble.BluetoothCharacteristic c, ble.BluetoothCharacteristic c1, ble.BluetoothCharacteristic c2, ble.BluetoothCharacteristic c3, ble.BluetoothCharacteristic c4) async {
+  refreshAll(ble.BluetoothCharacteristic c, ble.BluetoothCharacteristic c1, ble.BluetoothCharacteristic c2, ble.BluetoothCharacteristic c3, ble.BluetoothCharacteristic c4, ble.BluetoothCharacteristic c5) async {
     await refresh(c);
     Future.delayed(const Duration(
         milliseconds: 2000), () async {
@@ -786,6 +731,10 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
     Future.delayed(const Duration(
         milliseconds: 8000), () async {
       await refresh(c4);
+    });
+    Future.delayed(const Duration(
+        milliseconds: 10000), () async {
+      await refresh(c5);
     });
   }
 
