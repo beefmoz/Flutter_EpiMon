@@ -47,6 +47,7 @@ dependencies:
   volume_controller: ^2.0.3
   shared_preferences: ^2.0.15
   flutter_foreground_task: ^3.7.3
+  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:

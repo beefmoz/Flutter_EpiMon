@@ -122,15 +122,27 @@ class MainPage extends StatefulWidget {
 class _MainPage extends State<MainPage> {
   var location= new loc.Location();
   final Telephony telephony = Telephony.instance;
+  final NotesController= TextEditingController();
 
+  // seepreferences() async
+  // {
+  //   WidgetsFlutterBinding.ensureInitialized();
+  //   SharedPreferences preferences= await SharedPreferences.getInstance();
+  //   var user= preferences.getString('user');
+  //   var role= preferences.getString('role');
+  //   var id= preferences.getInt('id');
+  //   print(user);
+  //   print(role);
+  //   print(id);
+  // }
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     init();
+    // seepreferences();
     super.initState();
     // Get current state
   }
-
 
   @override
   void dispose() {
@@ -151,8 +163,8 @@ class _MainPage extends State<MainPage> {
     }
     // print('mainpage');
     // print('setforeground');
-    FlutterBackgroundService()
-        .sendData({"action": "setAsBackground"});
+    // FlutterBackgroundService()
+    //     .sendData({"action": "setAsBackground"});
     final Telephony telephony = Telephony.instance;
     final FlutterTts fluttertts = FlutterTts();
     int epi=1;
@@ -229,7 +241,7 @@ class _MainPage extends State<MainPage> {
                                         name = p.data![x].name;
                                         crtkint = p.data![x].caretaker_id;
                                         cont = p.data![x].contact;
-                                        //print(name);
+                                        // print(widget.username);
                                       }
                                     }
                                     for (int y = 0; y < c.data!.length; y++) {
@@ -312,7 +324,7 @@ class _MainPage extends State<MainPage> {
                                                     MaterialPageRoute(
                                                       builder: (context) {
                                                         return HistoryPage(
-                                                          id: widget.id, name: name,);
+                                                          id: widget.id, name: widget.username, role: widget.role);
                                                       },
                                                     ),
                                                   );
@@ -351,6 +363,21 @@ class _MainPage extends State<MainPage> {
                                                 }
                                             ),
                                           ),
+                                          //
+                                          // ListTile(
+                                          //   title: ElevatedButton(
+                                          //       child: const Text(
+                                          //           "print"),
+                                          //       onPressed: () async {
+                                          //         SharedPreferences preferences= await SharedPreferences.getInstance();
+                                          //         var user= preferences.getString('user');
+                                          //         var role= preferences.getString('role');
+                                          //         var id= preferences.getInt('id');
+                                          //         print(user);
+                                          //         print(role);
+                                          //         print(id);
+                                          //       }),
+                                          // ),
 
                                           Divider(),
 
@@ -459,12 +486,14 @@ class _MainPage extends State<MainPage> {
                                                                         context) {
                                                                       return HistoryPage(
                                                                         id: patientid!,
-                                                                        name: pname,);
+                                                                        name: pname,
+                                                                      role: widget.role);
                                                                     },
                                                                   ),
                                                                 );
                                                               }),
                                                         ),
+
                                                       ]
                                                   );
                                                 }

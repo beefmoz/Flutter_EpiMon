@@ -138,6 +138,8 @@ class API_Manager {
           Gyroscopic_Changes: u["Gyroscopic_Changes"].toDouble(),
           patient_id: u["patient_id"],
           heartrate_history: u["heartrate_history"],
+          stress_history: u["stress_history"],
+          notes: u["notes"],
         );
         histories.add(p);
       }

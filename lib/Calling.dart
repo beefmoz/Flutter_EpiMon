@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/MainPage.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -66,7 +67,7 @@ class _CallingPageState extends State<CallingPage> {
     String x= '';
     String y= '';
     String z= '';
-    String gyromag= '';
+    String gyromag= '0';
     int epi=1;
     List<double> hrlist= [];
     List<double> strlist = [];
@@ -89,7 +90,9 @@ class _CallingPageState extends State<CallingPage> {
 
                 contactstr= contact.toString().replaceAll(",", ".");
                 VolumeController().maxVolume();
-                FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
+
+                // FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
+
                 String msg= 'There is an emergency at ' + widget.loc.toString() + ', ' + widget.name + 'is having a seizure and is in need of aid. Their contact number is.' + contactstr;
                 speak(msg, epi);
                 if (!snapshot.hasData) {
@@ -115,12 +118,15 @@ class _CallingPageState extends State<CallingPage> {
                       if (hrstring != null) {
                         hr = int.parse(hrstring!).toDouble();
                         // List<double> hrlistdouble=[];
-                        hrlist.add(hr);
+                        Timer.periodic(const Duration(seconds: 10), (timer) async {
+                          hrlist.add(hr);
+                        });
                         // print('hr');
                         // print('calling');
                       }
                       // print(hrlist);
                     });
+
 
                 subscriptionstress =
                     snapshot.data![2].characteristics[1].value.listen((event) {
@@ -128,7 +134,9 @@ class _CallingPageState extends State<CallingPage> {
                       if(strstring!=null) {
                         str = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
-                        strlist.add(str);
+                        Timer.periodic(const Duration(seconds: 10), (timer) async {
+                          strlist.add(str);
+                        });
                         // print('str');
                         // print(strlist);
                       }
@@ -225,25 +233,11 @@ class _CallingPageState extends State<CallingPage> {
                               postData(hrlist, strlist, timebegin, timeend, x, y, z, gyromag);
                               hrlist.clear();
                               fluttertts.stop();
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    subscriptionhr!.cancel();
-                                    subscriptionstress!.cancel();
-                                    subscriptionacc!.cancel();
-                                    subscriptiongyro!.cancel();
-                                    return MainPage(
-                                        username: widget.username,
-                                        role: widget.role,
-                                        id: widget.id,
-                                        succ: 1,
-                                        conn: 0,
-                                        device: widget.server!
-                                      // device: widget.server,
-                                    );
-                                  },
-                                ),
-                              );
+                              subscriptionhr!.cancel();
+                              subscriptionstress!.cancel();
+                              subscriptionacc!.cancel();
+                              subscriptiongyro!.cancel();
+                              showAlertDialog(context);
                             }),
                       ),
                     ]
@@ -268,6 +262,9 @@ class _CallingPageState extends State<CallingPage> {
     double avgHr=0;
     double addedStr=0;
     double avgStr=0;
+    if(gyro=='') {
+      gyro= '0';
+    }
     for (int i=0; i<hrlist.length; i++) {
       addedHr= addedHr+ hrlist[i];
     }
@@ -286,7 +283,10 @@ class _CallingPageState extends State<CallingPage> {
       "timestop": timeend,
       "Gyroscopic_Changes": gyro,
       "patient_id": widget.id.toString(),
-      "heartrate_history": "'" + hrlist.toString() + "'"
+      "heartrate_history": "'" + hrlist.toString() + "'",
+      "stress_history": "'" + strlist.toString() + "'",
+      "notes": "' '",
+
     };
     String jsonString = json.encode(jsonMp);
     try {
@@ -294,8 +294,8 @@ class _CallingPageState extends State<CallingPage> {
           Uri.parse('http://aspepilepsyproject.atspace.cc/access/addPlayHistory.php'),
           body: jsonString
       );
-      // print(response.body);
-      // print(response.statusCode);
+      print(response.body);
+      print(response.statusCode);
     } catch(e) {
       // print("Error");
       // print(e);
@@ -315,5 +315,30 @@ class _CallingPageState extends State<CallingPage> {
       }
     }
     // Future.delayed(const Duration(milliseconds:4000));
+  }
+  showAlertDialog(BuildContext context) {
+    // Create button
+    Widget successButton = RaisedButton(
+      child: Text("OK"),
+      onPressed: () async{
+        SystemNavigator.pop();
+      },
+    );
+
+    // Create AlertDialog
+    AlertDialog alertSuccess = AlertDialog(
+      title: Text("Recorded readings"),
+      content: Text("Your readings have been recorded. The app will now restart. Please take care."),
+      actions: [
+        successButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alertSuccess;
+      },
+    );
   }
 }

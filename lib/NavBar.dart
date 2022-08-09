@@ -88,7 +88,7 @@ class _NavBar extends State<NavBar> {
                           MaterialPageRoute(
                             builder: (context) {
                               return HistoryPage(
-                                id: widget.id, name: widget.username,);
+                                id: widget.id, name: widget.username, role: widget.role);
                             },
                           ),
                         );
@@ -187,7 +187,7 @@ class _NavBar extends State<NavBar> {
                           MaterialPageRoute(
                             builder: (context) {
                               return HistoryPage(
-                                id: widget.id, name: widget.username,);
+                                id: widget.id, name: widget.username, role: widget.role);
                             },
                           ),
                         );

@@ -399,6 +399,7 @@ Widget inputFile({label, obscureText= false, controller})
             borderSide: BorderSide(color: Colors.grey)
           )
         ),
+        keyboardType: TextInputType.text,
       ),
       SizedBox(height: 10)
     ]

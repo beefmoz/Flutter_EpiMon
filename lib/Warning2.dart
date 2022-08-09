@@ -91,7 +91,10 @@ class _WarningPageState2 extends State<WarningPage2> {
                       if(hrstring!=null) {
                         hr = int.parse(hrstring!).toDouble();
                         // List<double> hrlistdouble=[];
-                        hrlist.add(hr);
+
+                        Timer.periodic(const Duration(seconds: 10), (timer) async {
+                          hrlist.add(hr);
+                        });
                         // print('wrning');
                         // print('hr');
                         // print(hrlist);
@@ -105,7 +108,10 @@ class _WarningPageState2 extends State<WarningPage2> {
                       if(strstring!=null) {
                         str = int.parse(strstring!).toDouble();
                         // List<double> hrlistdouble=[];
-                        strlist.add(str);
+                        Timer.periodic(const Duration(seconds: 10), (timer) async {
+                          strlist.add(str);
+                        });
+                        print(strlist);
                         // print('wrning');
                         // print(strlist);
                       }

@@ -25,71 +25,6 @@ import 'Login.dart';
 import 'MainPage.dart';
 import 'NavBar.dart';
 
-ReceivePort? _receivePort;
-
-void startCallback() {
-  // The setTaskHandler function must be called to handle the task in the background.
-  FlutterForegroundTask.setTaskHandler(MyTaskHandler());
-}
-
-class MyTaskHandler extends TaskHandler {
-  SendPort? _sendPort;
-  int _eventCount = 0;
-
-  @override
-  Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-    _sendPort = sendPort;
-
-    // You can use the getData function to get the stored data.
-    final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
-    // print('customData: $customData');
-  }
-
-  @override
-  Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-    FlutterForegroundTask.updateService(
-        notificationTitle: 'EpiMon Status',
-        notificationText: 'EpiMon is running smoothly.'
-    );
-
-    // // Send data to the main isolate.
-    // sendPort?.send(_eventCount);
-    //
-    // _eventCount++;
-    // if (_eventCount>3) {
-    //   FlutterForegroundTask.launchApp("/resume-route");
-    // }
-  }
-
-  @override
-  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
-    // You can use the clearAllData function to clear all the stored data.
-    await FlutterForegroundTask.clearAllData();
-  }
-
-  @override
-  void onButtonPressed(String id) {
-    // Called when the notification button on the Android platform is pressed.
-    print('onButtonPressed >> $id');
-  }
-
-  @override
-  void onNotificationPressed() {
-    // Called when the notification itself on the Android platform is pressed.
-    //
-    // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-    // this function to be called.
-
-    // Note that the app will only route to "/resume-route" when it is exited so
-    // it will usually be necessary to send a message through the send port to
-    // signal it to restore state when the app is already started.
-    FlutterForegroundTask.launchApp();
-    _sendPort?.send('onNotificationPressed');
-  }
-}
-
-
 class MainPageConnected2 extends StatefulWidget {
   final ble.BluetoothDevice device;
   final String username;
@@ -112,105 +47,23 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
   StreamSubscription? subscriptionfall;
   StreamSubscription? subscriptionhr;
 
-  Future<bool> _startForegroundTask() async {
-    // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-    // onNotificationPressed function to be called.
-    //
-    // When the notification is pressed while permission is denied,
-    // the onNotificationPressed function is not called and the app opens.
-    //
-    // If you do not use the onNotificationPressed or launchApp function,
-    // you do not need to write this code.
-
-  //
-  // You can save data using the saveData function.
-  await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-  //
-    ReceivePort? receivePort;
-    if (await FlutterForegroundTask.isRunningService) {
-      receivePort = await FlutterForegroundTask.restartService();
-    } else {
-      receivePort = await FlutterForegroundTask.startService(
-        notificationTitle: 'Foreground Service is running',
-        notificationText: 'Tap to return to the app',
-        callback: startCallback,
-      );
-    }
-
-    return _registerReceivePort(receivePort);
-  }
-
-  Future<bool> _stopForegroundTask() async {
-    return await FlutterForegroundTask.stopService();
-  }
-
-  bool _registerReceivePort(ReceivePort? receivePort) {
-    _closeReceivePort();
-
-    if (receivePort != null) {
-      _receivePort = receivePort;
-      _receivePort?.listen((message) {
-        if (message is int) {
-          // print('eventCount: $message');
-        } else if (message is String) {
-          if (message == 'onNotificationPressed') {
-            Navigator.of(context).pushNamed('/resume-route');
-          }
-        } else if (message is DateTime) {
-          // print('timestamp: ${message.toString()}');
-        }
-      });
-
-      return true;
-    }
-
-    return false;
-  }
-
-  void _closeReceivePort() {
-    _receivePort?.close();
-    _receivePort = null;
-  }
-
-  T? _ambiguate<T>(T? value) => value;
-
   @override
 
   //if()
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
-    init();
-    // initializeService();
     super.initState();
-    _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
-      // You can get the previous ReceivePort without restarting the service.
-      if (await FlutterForegroundTask.isRunningService) {
-        final newReceivePort = await FlutterForegroundTask.receivePort;
-        _registerReceivePort(newReceivePort);
-      }
-    });
   }
 
   @override
   void dispose() {
-    // ser.FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
-    // _collectingTask?.dispose();
-    // _closeReceivePort();
     super.dispose();
 
   }
 
-
   @override
 
   Widget build(BuildContext context) {
-    // initializeService();
-    _startForegroundTask();
-    // FlutterForegroundTask.startService(
-    //   notificationTitle: 'Foreground Service is running',
-    //   notificationText: 'Tap to return to the app',
-    //   callback: startCallback,
-    // );
     showLogoutDialog(BuildContext context) {
       // Create button
       Widget YesButton = RaisedButton(
@@ -292,15 +145,6 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                       ),
                     )
                 ),
-                // Padding(
-                //     padding: EdgeInsets.only(right: 20.0),
-                //     child: GestureDetector(
-                //       onTap: () {},
-                //       child: Icon(
-                //           Icons.more_vert
-                //       ),
-                //     )
-                // ),
               ],
             ),
             body: Container(
@@ -327,18 +171,6 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                         FlutterBackgroundService()
                             .sendData({"action": "setAsForeground"});
 
-                        // subscriptionstt =
-                        //   widget.device.state.listen((event) {
-                        //       if (event != null) {
-                        //         print('state: ');
-                        //         print(event);
-                        //         if(event == ble.BluetoothDeviceState.disconnected || event== ble.BluetoothDeviceState.connecting) {
-                        //           widget.device.connect();
-                        //         }
-                        //       }
-                        //     }
-                        //   );
-
                         subscriptionfall =
                             snapshotblue.data![2].characteristics[0].value.listen((
                                 event) {
@@ -358,10 +190,10 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                       crtk +
                                       ", we will monitor the conditions and call for emergency immediately.";
 
-                                  telephony.sendSms(
-                                      to: crtkcon,
-                                      message: emermsg
-                                  );
+                                  // telephony.sendSms(
+                                  //     to: crtkcon,
+                                  //     message: emermsg
+                                  // );
                                   // print('sending message');
 
                                   snapshotblue.data![2].characteristics[0].write(utf8.encode('0'));
@@ -660,7 +492,8 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                           builder: (context) {
                                                             return HistoryPage(
                                                               id: widget.id,
-                                                              name: name,);
+                                                              name: name,
+                                                            role: widget.role);
                                                           },
                                                         ),
                                                       );

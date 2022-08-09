@@ -35,6 +35,8 @@ class History {
   final double Gyroscopic_Changes;
   final int patient_id;
   final String heartrate_history;
+  final String stress_history;
+  final String notes;
 
   History({
     required this.id,
@@ -47,7 +49,9 @@ class History {
     required this.timestop,
     required this.Gyroscopic_Changes,
     required this.patient_id,
-    required this.heartrate_history
+    required this.heartrate_history,
+    required this.stress_history,
+    required this.notes,
   });
 
   factory History.fromJson(Map<String, dynamic> json) => History(
@@ -61,7 +65,9 @@ class History {
       timestop: json["timestop"],
       Gyroscopic_Changes: json["Gyroscopic_Changes"],
       patient_id: json["patient_id"],
-      heartrate_history: json["heartrate_history"]
+      heartrate_history: json["heartrate_history"],
+      stress_history: json["stress_history"],
+      notes: json["notes"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -76,5 +82,6 @@ class History {
     "Gyroscopic_Changes": Gyroscopic_Changes,
     'patient_id': patient_id,
     'heartrate_history': heartrate_history,
+    'stress_history': stress_history,
   };
 }

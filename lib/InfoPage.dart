@@ -1,5 +1,6 @@
 
 
+import 'package:epimon2/EditInfoPage.dart';
 import 'package:flutter/material.dart';
 import 'package:epimon2/Models/Doctors_Class.dart';
 
@@ -45,6 +46,7 @@ class _InfoPageState extends State<InfoPage> {
                     int patientid = 0;
                     int doctorid = 0;
                     int? caretakerid=0;
+                    String pw='';
 
                     String doctorusername = '';
                     String doctoremail = '';
@@ -70,6 +72,7 @@ class _InfoPageState extends State<InfoPage> {
                       for (int i = 0; i < Patient.data!.length; i++) {
                         if (widget.username == Patient.data![i].username) {
                           name = Patient.data![i].name;
+                          patientid = Patient.data![i].patient_id;
                           username = Patient.data![i].username;
                           email = Patient.data![i].email;
                           age = Patient.data![i].age;
@@ -77,6 +80,7 @@ class _InfoPageState extends State<InfoPage> {
                           patientid = Patient.data![i].patient_id;
                           caretakerid = Patient.data![i].caretaker_id;
                           doctorid = Patient.data![i].doctor_id;
+                          pw = Patient.data![i].password;
                         }
                       }
                       for (int x = 0; x < Doctor.data!.length; x++) {
@@ -179,6 +183,31 @@ class _InfoPageState extends State<InfoPage> {
                                               )),
                                           subtitle: Text(doctoremail),
                                         ),
+                                        ListTile(
+                                          title: ElevatedButton(
+                                              child: const Text(
+                                                  'Edit your info'),
+                                              onPressed: () async {
+                                                await Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return EditInfoPage(
+                                                          name: name,
+                                                          username: username,
+                                                          email: email,
+                                                          age: age.toString(),
+                                                          contact: contact,
+                                                          pw: pw,
+                                                          role: widget.role,
+                                                          id: patientid,
+                                                          succ: 1
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              }
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -219,6 +248,7 @@ class _InfoPageState extends State<InfoPage> {
                     String contact = '';
                     int? patientid = 0;
                     int caretakerid = 0;
+                    String pw='';
 
                     String Patientname = '';
                     String Patientemail = '';
@@ -237,6 +267,7 @@ class _InfoPageState extends State<InfoPage> {
                           contact = Caretaker.data![i].contact;
                           patientid = Caretaker.data![i].patient_id;
                           caretakerid = Caretaker.data![i].caretaker_id;
+                          pw= Caretaker.data![i].password;
                         }
                       }
                       for (int x = 0; x < Patient.data!.length; x++) {
@@ -309,6 +340,31 @@ class _InfoPageState extends State<InfoPage> {
                                               )),
                                           subtitle: Text(Patientname),
                                         ),
+                                        ListTile(
+                                          title: ElevatedButton(
+                                              child: const Text(
+                                                  'Edit your info'),
+                                              onPressed: () async {
+                                                await Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return EditInfoPage(
+                                                          name: name,
+                                                          username: username,
+                                                          email: email,
+                                                          age: age.toString(),
+                                                          contact: contact,
+                                                          pw: pw,
+                                                          role: widget.role,
+                                                          id: caretakerid,
+                                                          succ: 1
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              }
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -330,3 +386,6 @@ class _InfoPageState extends State<InfoPage> {
     }
   }
 }
+
+
+
