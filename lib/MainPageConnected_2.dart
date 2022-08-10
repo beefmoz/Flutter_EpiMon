@@ -493,6 +493,8 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                                             return HistoryPage(
                                                               id: widget.id,
                                                               name: name,
+                                                            caretakername: null,
+                                                            caretakerid: null,
                                                             role: widget.role);
                                                           },
                                                         ),

@@ -24,8 +24,10 @@ class ChartData2 {
 class HistoryPage extends StatefulWidget {
   final int id;
   final String name;
+  final String? caretakername;
+  final int? caretakerid;
   final String role;
-  const HistoryPage({required this.id, required this.name, required this.role});
+  const HistoryPage({required this.id, required this.name, required this.caretakername, required this.caretakerid ,required this.role});
   @override
   _HistoryPageState createState() => _HistoryPageState();
 }
@@ -132,7 +134,8 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget build(BuildContext context) {
-    return WillPopScope(
+    if (widget.role=='patient') {
+      return WillPopScope(
         onWillPop: () async {
           Navigator.of(context).pop();
           SharedPreferences preferences = await SharedPreferences
@@ -151,132 +154,331 @@ class _HistoryPageState extends State<HistoryPage> {
               widget.id);
           return false;
         },
-    child: Scaffold(
-        appBar: AppBar(
-            title: Text(widget.name +"'s History")
-        ),
-        body: Container(
-          child: Card(
-            child: FutureBuilder<List<History>>(
-                future: API_Manager().getHistoryData(),
-                builder: (context, snapshot){
-                  return FutureBuilder<List<PatientInfo>>(
-                      future: API_Manager().getPatientsList(),
-                      builder: (context, patient){
-                        if(snapshot.data==null || patient.data==null ) {
-                          // print('error: ');
-                          // print(snapshot.error?.toString());
-                          return Container(child: Center(child: CircularProgressIndicator(),
-                          ),
-                          );
-                        }
-                        else {
-                          List<History> currentPatientHistory= [];
-                          for (int i=snapshot.data!.length-1; i>=0; i--){
-                            if(widget.id==snapshot.data![i].patient_id) {
-                              currentPatientHistory.add(snapshot.data![i]);
-                              if(currentPatientHistory.length==5) {
-                                break;
+        child: Scaffold(
+            appBar: AppBar(
+                title: Text(widget.name + "'s History")
+            ),
+            body: Container(
+              child: Card(
+                child: FutureBuilder<List<History>>(
+                    future: API_Manager().getHistoryData(),
+                    builder: (context, snapshot) {
+                      return FutureBuilder<List<PatientInfo>>(
+                          future: API_Manager().getPatientsList(),
+                          builder: (context, patient) {
+                            if (snapshot.data == null || patient.data == null) {
+                              // print('error: ');
+                              // print(snapshot.error?.toString());
+                              return Container(child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              );
+                            }
+                            else {
+                              List<History> currentPatientHistory = [];
+                              for (int i = snapshot.data!.length - 1; i >=
+                                  0; i--) {
+                                if (widget.id == snapshot.data![i].patient_id) {
+                                  currentPatientHistory.add(snapshot.data![i]);
+                                  if (currentPatientHistory.length == 5) {
+                                    break;
+                                  }
+                                }
                               }
+
+                              return SafeArea(child: ListView.builder(
+                                itemCount: currentPatientHistory.length,
+                                itemBuilder: (context, i) {
+                                  List<
+                                      String> hrstringlist = currentPatientHistory[i]
+                                      .heartrate_history.replaceAll('[', '')
+                                      .replaceAll(']', '')
+                                      .split(',');
+                                  List<
+                                      String> strstringlist = currentPatientHistory[i]
+                                      .stress_history.replaceAll('[', '')
+                                      .replaceAll(']', '')
+                                      .split(',');
+                                  final List<ChartData> hrlist = [];
+                                  final List<ChartData2> strlist = [];
+                                  final NotesController = TextEditingController(
+                                      text: currentPatientHistory[i].notes);
+                                  int historyid = currentPatientHistory[i].id;
+                                  for (int t = 0; t <
+                                      hrstringlist.length; t++) {
+                                    if (hrstringlist[t] == "") {
+                                      hrstringlist.remove(hrstringlist[t]);
+                                    }
+                                    else {
+                                      // print(hrstringlist[t]);
+                                      double hr = double.parse(hrstringlist[t]);
+                                      hrlist.add(ChartData(t * 10, hr));
+                                    }
+                                  }
+
+                                  for (int t = 0; t <
+                                      strstringlist.length; t++) {
+                                    if (strstringlist[t] == "") {
+                                      strstringlist.remove(hrstringlist[t]);
+                                    }
+                                    if (strstringlist[t] == "") {
+                                      strstringlist.remove(strstringlist[t]);
+                                    }
+                                    else {
+                                      // print(hrstringlist[t]);
+                                      double str = double.parse(
+                                          strstringlist[t]);
+                                      strlist.add(ChartData2(t * 10, str));
+                                    }
+                                  }
+                                  //print(hrlist[i].hr);
+                                  return Card(
+                                    child: ExpansionTile(
+                                      title: Text(parseDateTimeDisplay(
+                                          DateFormat('yyyy-MM-dd – kk:mm')
+                                              .format(DateTime.parse(
+                                              currentPatientHistory[i]
+                                                  .timestart)))),
+                                      children: [
+                                        Text("Average Heart Rate: " +
+                                            currentPatientHistory[i].HeartRate
+                                                .toString() + "bpm",
+                                          style: TextStyle(
+                                              color: Colors.indigo),),
+
+                                        Text("Average Stress Level: " +
+                                            currentPatientHistory[i].Stress
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: Colors.pink)),
+                                        notesFile(label: 'Notes',
+                                            controller: NotesController),
+                                        RaisedButton(
+                                            child: Text('Save note'),
+                                            color: Colors.blue,
+                                            textColor: Colors.white,
+                                            onPressed: () async {
+                                              String notes = NotesController
+                                                  .text;
+                                              Map<String, dynamic> jsonMp2 = {
+                                                "notes": '"' + notes + '"',
+                                                "id": '"' +
+                                                    historyid.toString() + '"',
+                                              };
+
+                                              String jsonString = json.encode(
+                                                  jsonMp2);
+
+                                              try {
+                                                var response = await http.post(
+                                                    Uri.parse(
+                                                        'http://aspepilepsyproject.atspace.cc/access/updatehistorynotes.php'),
+                                                    body: jsonString
+                                                );
+                                                print(response.body);
+                                                print(response.statusCode);
+                                              } catch (e) {
+                                                // print("Error");
+                                                // print(e);
+                                              }
+                                              showAlertDialog(context);
+                                            }
+                                        ),
+                                        SizedBox(height: 20),
+                                        SfCartesianChart(
+                                          title: ChartTitle(
+                                              text: 'Heart Rate and Stress readings'),
+                                          primaryXAxis: CategoryAxis(
+                                              labelRotation: 0
+                                          ),
+                                          series: <ChartSeries>[
+                                            LineSeries<ChartData, int>(
+                                                dataSource: hrlist,
+                                                xValueMapper: (ChartData datas,
+                                                    _) => datas.s,
+                                                yValueMapper: (ChartData datas,
+                                                    _) => datas.hr),
+                                            LineSeries<ChartData2, int>(
+                                                dataSource: strlist,
+                                                xValueMapper: (ChartData2 datas,
+                                                    _) => datas.s,
+                                                yValueMapper: (ChartData2 datas,
+                                                    _) => datas.str),
+                                          ],),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              )
+                              );
+                              //return SafeArea(child: Scaffold( body: SfCartesianChart()));
                             }
                           }
+                      );
+                    }),
+              ),
+            )),
+      );
+    }
 
-                          return SafeArea(child: ListView.builder(
-                            itemCount: currentPatientHistory.length,
-                            itemBuilder: (context, i) {
-                              List<String> hrstringlist= currentPatientHistory[i].heartrate_history.replaceAll('[', '').replaceAll(']', '').split(',');
-                              List<String> strstringlist= currentPatientHistory[i].stress_history.replaceAll('[', '').replaceAll(']', '').split(',');
-                              final List<ChartData> hrlist= [];
-                              final List<ChartData2> strlist= [];
-                              final NotesController = TextEditingController(text: currentPatientHistory[i].notes);
-                              int historyid= currentPatientHistory[i].id;
-                              for (int t=0; t<hrstringlist.length; t++) {
-                                if(hrstringlist[t]=="") {
-                                  hrstringlist.remove(hrstringlist[t]);
-                                }
-                                else {
-                                  // print(hrstringlist[t]);
-                                  double hr = double.parse(hrstringlist[t]);
-                                  hrlist.add(ChartData(t * 10, hr));
-                                }
-                              }
-
-                              for (int t=0; t<strstringlist.length; t++) {
-                                if(strstringlist[t]=="") {
-                                  strstringlist.remove(hrstringlist[t]);
-                                }
-                                if(strstringlist[t]=="") {
-                                  strstringlist.remove(strstringlist[t]);
-                                }
-                                else {
-                                  // print(hrstringlist[t]);
-                                  double str = double.parse(strstringlist[t]);
-                                  strlist.add(ChartData2(t * 10, str));
-                                }
-                              }
-                              //print(hrlist[i].hr);
-                              return Card(
-                                child: ExpansionTile(
-                                  title: Text(parseDateTimeDisplay(DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(currentPatientHistory[i].timestart)))),
-                                  children: [
-                                    Text("Average Heart Rate: " + currentPatientHistory[i].HeartRate.toString() + "bpm",
-                                    style: TextStyle(color: Colors.indigo),),
-
-                                    Text("Average Stress Level: " + currentPatientHistory[i].Stress.toString(),
-                                    style: TextStyle(color: Colors.pink) ),
-                                    notesFile(label: 'Notes', controller: NotesController),
-                                    RaisedButton(
-                                        child: Text('Save note'),
-                                        color: Colors.blue,
-                                        textColor: Colors.white,
-                                        onPressed: () async {
-                                          String notes= NotesController.text;
-                                          Map<String, dynamic> jsonMp2 = {
-                                            "notes": '"' + notes + '"',
-                                            "id": '"' + historyid.toString() + '"',
-                                          };
-
-                                          String jsonString = json.encode(jsonMp2);
-
-                                          try {
-                                            var response = await http.post(
-                                                Uri.parse(
-                                                    'http://aspepilepsyproject.atspace.cc/access/updatehistorynotes.php'),
-                                                body: jsonString
-                                            );
-                                            print(response.body);
-                                            print(response.statusCode);
-                                          } catch (e) {
-                                            // print("Error");
-                                            // print(e);
-                                          }
-                                          showAlertDialog(context);
-                                        }
-                                    ),
-                                    SizedBox(height: 20),
-                                    SfCartesianChart(
-                                      title: ChartTitle(text: 'Heart Rate and Stress readings'),
-                                      primaryXAxis:CategoryAxis(
-                                          labelRotation: 0
-                                      ),
-                                      series: <ChartSeries>[
-                                        LineSeries<ChartData, int>(dataSource: hrlist, xValueMapper: (ChartData datas, _)=>datas.s, yValueMapper: (ChartData datas, _)=> datas.hr),
-                                        LineSeries<ChartData2, int>(dataSource: strlist, xValueMapper: (ChartData2 datas, _)=>datas.s, yValueMapper: (ChartData2 datas, _)=> datas.str),
-                                      ],),
-                                  ],
-                                ),
+    else {
+      return WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pop();
+          SharedPreferences preferences = await SharedPreferences
+              .getInstance();
+          // var user= preferences.getString('user');
+          // var role= preferences.getString('role');
+          // var id= preferences.getInt('id');
+          preferences.setString(
+              'user',
+              widget.caretakername!);
+          preferences.setString(
+              'role',
+              widget.role);
+          preferences.setInt(
+              'id',
+              widget.caretakerid!);
+          return false;
+        },
+        child: Scaffold(
+            appBar: AppBar(
+                title: Text(widget.name + "'s History")
+            ),
+            body: Container(
+              child: Card(
+                child: FutureBuilder<List<History>>(
+                    future: API_Manager().getHistoryData(),
+                    builder: (context, snapshot) {
+                      return FutureBuilder<List<PatientInfo>>(
+                          future: API_Manager().getPatientsList(),
+                          builder: (context, patient) {
+                            if (snapshot.data == null || patient.data == null) {
+                              // print('error: ');
+                              // print(snapshot.error?.toString());
+                              return Container(child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
                               );
-                            },
-                          )
-                          );
-                          //return SafeArea(child: Scaffold( body: SfCartesianChart()));
-                        }
-                      }
-                  );
-                }),
-          ),
-        )),
-    );
+                            }
+                            else {
+                              List<History> currentPatientHistory = [];
+                              for (int i = snapshot.data!.length - 1; i >=
+                                  0; i--) {
+                                if (widget.id == snapshot.data![i].patient_id) {
+                                  currentPatientHistory.add(snapshot.data![i]);
+                                  if (currentPatientHistory.length == 5) {
+                                    break;
+                                  }
+                                }
+                              }
+
+                              return SafeArea(child: ListView.builder(
+                                itemCount: currentPatientHistory.length,
+                                itemBuilder: (context, i) {
+                                  List<
+                                      String> hrstringlist = currentPatientHistory[i]
+                                      .heartrate_history.replaceAll('[', '')
+                                      .replaceAll(']', '')
+                                      .split(',');
+                                  List<
+                                      String> strstringlist = currentPatientHistory[i]
+                                      .stress_history.replaceAll('[', '')
+                                      .replaceAll(']', '')
+                                      .split(',');
+                                  final List<ChartData> hrlist = [];
+                                  final List<ChartData2> strlist = [];
+                                  for (int t = 0; t <
+                                      hrstringlist.length; t++) {
+                                    if (hrstringlist[t] == "") {
+                                      hrstringlist.remove(hrstringlist[t]);
+                                    }
+                                    else {
+                                      // print(hrstringlist[t]);
+                                      double hr = double.parse(hrstringlist[t]);
+                                      hrlist.add(ChartData(t * 10, hr));
+                                    }
+                                  }
+
+                                  for (int t = 0; t <
+                                      strstringlist.length; t++) {
+                                    if (strstringlist[t] == "") {
+                                      strstringlist.remove(hrstringlist[t]);
+                                    }
+                                    if (strstringlist[t] == "") {
+                                      strstringlist.remove(strstringlist[t]);
+                                    }
+                                    else {
+                                      // print(hrstringlist[t]);
+                                      double str = double.parse(
+                                          strstringlist[t]);
+                                      strlist.add(ChartData2(t * 10, str));
+                                    }
+                                  }
+                                  //print(hrlist[i].hr);
+                                  return Card(
+                                    child: ExpansionTile(
+                                      title: Text(parseDateTimeDisplay(
+                                          DateFormat('yyyy-MM-dd – kk:mm')
+                                              .format(DateTime.parse(
+                                              currentPatientHistory[i]
+                                                  .timestart)))),
+                                      children: [
+                                        Text("Average Heart Rate: " +
+                                            currentPatientHistory[i].HeartRate
+                                                .toString() + "bpm",
+                                          style: TextStyle(
+                                              color: Colors.indigo),),
+
+                                        Text("Average Stress Level: " +
+                                            currentPatientHistory[i].Stress
+                                                .toString(),
+                                            style: TextStyle(
+                                                color: Colors.pink)),
+                                        ListTile(
+                                          title: const Text("Notes",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold
+                                              )),
+                                          subtitle: Text(currentPatientHistory[i].notes),
+                                        ),
+                                        SizedBox(height: 20),
+                                        SfCartesianChart(
+                                          title: ChartTitle(
+                                              text: 'Heart Rate and Stress readings'),
+                                          primaryXAxis: CategoryAxis(
+                                              labelRotation: 0
+                                          ),
+                                          series: <ChartSeries>[
+                                            LineSeries<ChartData, int>(
+                                                dataSource: hrlist,
+                                                xValueMapper: (ChartData datas,
+                                                    _) => datas.s,
+                                                yValueMapper: (ChartData datas,
+                                                    _) => datas.hr),
+                                            LineSeries<ChartData2, int>(
+                                                dataSource: strlist,
+                                                xValueMapper: (ChartData2 datas,
+                                                    _) => datas.s,
+                                                yValueMapper: (ChartData2 datas,
+                                                    _) => datas.str),
+                                          ],),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              )
+                              );
+                              //return SafeArea(child: Scaffold( body: SfCartesianChart()));
+                            }
+                          }
+                      );
+                    }),
+              ),
+            )),
+      );
+    }
   }
   showAlertDialog(BuildContext context) {
     // Create button

@@ -324,7 +324,7 @@ class _MainPage extends State<MainPage> {
                                                     MaterialPageRoute(
                                                       builder: (context) {
                                                         return HistoryPage(
-                                                          id: widget.id, name: widget.username, role: widget.role);
+                                                          id: widget.id, name: widget.username, caretakerid: null, caretakername: null, role: widget.role);
                                                       },
                                                     ),
                                                   );
@@ -477,15 +477,15 @@ class _MainPage extends State<MainPage> {
                                                               child: const Text(
                                                                   "View Patient's Epileptic History"),
                                                               onPressed: () async {
-                                                                await Navigator.of(
-                                                                    context).push(
+                                                                await Navigator.of(context).push(
                                                                   MaterialPageRoute(
-                                                                    builder: (
-                                                                        context) {
+                                                                    builder: (context) {
                                                                       return HistoryPage(
-                                                                        id: patientid!,
-                                                                        name: pname,
-                                                                      role: widget.role);
+                                                                          id: patientid!,
+                                                                          name: pname,
+                                                                          caretakerid: widget.id,
+                                                                          caretakername: widget.username,
+                                                                          role: widget.role);
                                                                     },
                                                                   ),
                                                                 );

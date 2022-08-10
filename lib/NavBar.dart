@@ -28,7 +28,7 @@ class _NavBar extends State<NavBar> {
   String? currloc= '';
   @override
   Widget build(BuildContext context) {
-    if(widget.role=='patient') {
+    if(widget.role== 'patient') {
       return Drawer(
           child: FutureBuilder<List<geo.Placemark>>(
               future: checkloc(),
@@ -94,6 +94,8 @@ class _NavBar extends State<NavBar> {
                                 return HistoryPage(
                                     id: widget.id,
                                     name: widget.username,
+                                    caretakerid: null,
+                                    caretakername: null,
                                     role: widget.role);
                               },
                             ),
@@ -148,129 +150,6 @@ class _NavBar extends State<NavBar> {
 
 
                 else {
-                  return FutureBuilder<List<CaretakerInfo>>(
-                      future: API_Manager().getCaretakersList(),
-                      builder: (context, Caretaker) {
-                        return FutureBuilder<List<PatientInfo>>(
-                            future: API_Manager()
-                                .getPatientsList(),
-                            builder: (context, p) {
-                        if (Caretaker.data == null) {
-                          // print(
-                          //     Caretaker.error?.toString());
-                          // print(p.error?.toString());
-                          return Container(
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
-
-                        int? patientid = 0;
-                        String? pname = '';
-                        for (int i = 0; i <
-                            Caretaker.data!.length; i++) {
-                          if (Caretaker.data![i]
-                              .caretaker_id == widget.id) {
-                            patientid = Caretaker.data![i]
-                                .patient_id;
-                          }
-                        }
-                        for (int i = 0; i <
-                            p.data!.length; i++) {
-                          if (p.data![i].patient_id ==
-                              patientid) {
-                            pname = p.data![i].name;
-                          }
-                        }
-
-                        return ListView(
-                          // Remove padding
-                          padding: EdgeInsets.zero,
-                          children: [
-                            UserAccountsDrawerHeader(
-                              accountName: Text('Welcome, ' + widget.username),
-                              accountEmail: Text('Location: ' + currloc!),
-                              currentAccountPicture: CircleAvatar(
-                                child: ClipOval(
-                                  child: Image.network(
-                                    'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                                    fit: BoxFit.cover,
-                                    width: 90,
-                                    height: 90,
-                                  ),
-                                ),
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: NetworkImage(
-                                        'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')
-                                ),
-                              ),
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.favorite),
-                              title: Text('Profile'),
-                              onTap: () async {
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return InfoPage(
-                                          username: widget.username,
-                                          role: widget.role);
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.person),
-                              title: Text('History'),
-                              onTap: () async {
-                                await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return HistoryPage(
-                                          id: patientid!,
-                                          name: pname!,
-                                          role: widget.role);
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.share),
-                              title: Text('Disconnect from EpiDevice'),
-                              onTap: () async {
-                                showDisconnectDialog(context);
-                              },
-                            ),
-                          ],
-                        );
-                      });
-                });
-              }})
-      );
-    }
-
-    else {
-      return Drawer(
-          child: FutureBuilder<List<geo.Placemark>>(
-              future: checkloc(),
-              builder: (context, l) {
-                if (l.data == null) {
-                  return Container(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-
-                currloc = l.data![0].street;
-                if (widget.device == null) {
                   return ListView(
                     // Remove padding
                     padding: EdgeInsets.zero,
@@ -322,69 +201,8 @@ class _NavBar extends State<NavBar> {
                                 return HistoryPage(
                                     id: widget.id,
                                     name: widget.username,
-                                    role: widget.role);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                }
-
-
-                else {
-                  return ListView(
-                    // Remove padding
-                    padding: EdgeInsets.zero,
-                    children: [
-                      UserAccountsDrawerHeader(
-                        accountName: Text('Welcome, ' + widget.username),
-                        accountEmail: Text('Location: ' + currloc!),
-                        currentAccountPicture: CircleAvatar(
-                          child: ClipOval(
-                            child: Image.network(
-                              'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                              fit: BoxFit.cover,
-                              width: 90,
-                              height: 90,
-                            ),
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: NetworkImage(
-                                  'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.favorite),
-                        title: Text('Profile'),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return InfoPage(
-                                    username: widget.username,
-                                    role: widget.role);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.person),
-                        title: Text('History'),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return HistoryPage(
-                                    id: widget.id,
-                                    name: widget.username,
+                                    caretakerid: null,
+                                    caretakername: null,
                                     role: widget.role);
                               },
                             ),
@@ -405,7 +223,117 @@ class _NavBar extends State<NavBar> {
           )
       );
     }
+
+    //for ctk //////////////////////////////////////////////////////////////////////////////////////////////
+    else {
+      return Drawer(
+          child: FutureBuilder<List<geo.Placemark>>(
+              future: checkloc(),
+              builder: (context, l) {
+                return FutureBuilder<List<CaretakerInfo>>(
+                    future: API_Manager().getCaretakersList(),
+                    builder: (context, Caretaker) {
+                      return FutureBuilder<List<PatientInfo>>(
+                          future: API_Manager()
+                              .getPatientsList(),
+                          builder: (context, p) {
+                            if (l.data == null || p.data == null || Caretaker.data == null) {
+                              return Container(
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+
+                            currloc = l.data![0].street;
+                            int? patientid = 0;
+                            String? pname = '';
+                            for (int i = 0; i <
+                                Caretaker.data!.length; i++) {
+                              if (Caretaker.data![i]
+                                  .caretaker_id == widget.id) {
+                                patientid = Caretaker.data![i]
+                                    .patient_id;
+                              }
+                            }
+                            for (int i = 0; i <
+                                p.data!.length; i++) {
+                              if (p.data![i].patient_id ==
+                                  patientid) {
+                                pname = p.data![i].name;
+                              }
+                            }
+
+                            return ListView(
+                              // Remove padding
+                              padding: EdgeInsets.zero,
+                              children: [
+                                UserAccountsDrawerHeader(
+                                  accountName: Text(
+                                      'Welcome, ' + widget.username),
+                                  accountEmail: Text('Location: ' + currloc!),
+                                  currentAccountPicture: CircleAvatar(
+                                    child: ClipOval(
+                                      child: Image.network(
+                                        'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
+                                        fit: BoxFit.cover,
+                                        width: 90,
+                                        height: 90,
+                                      ),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    image: DecorationImage(
+                                        fit: BoxFit.fill,
+                                        image: NetworkImage(
+                                            'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')
+                                    ),
+                                  ),
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.favorite),
+                                  title: Text('Profile'),
+                                  onTap: () async {
+                                    await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return InfoPage(
+                                              username: widget.username,
+                                              role: widget.role);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.person),
+                                  title: Text('History'),
+                                  onTap: () async {
+                                    await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return HistoryPage(
+                                              id: patientid!,
+                                              name: pname!,
+                                              caretakerid: widget.id,
+                                              caretakername: widget.username,
+                                              role: widget.role);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                    }
+                );
+              }));
+    }
   }
+
   Future<List<geo.Placemark>> checkloc() async {
     var currcoord= await location.getLocation();
     List<geo.Placemark> placemarks = await geo.placemarkFromCoordinates(currcoord.latitude!.toDouble(), currcoord.longitude!.toDouble());
