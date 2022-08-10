@@ -54,6 +54,10 @@ class _WarningPageState2 extends State<WarningPage2> {
     double hr = 0.0;
     double str= 0.0;
     int epi=1;
+    int prevmillishr=DateTime.now().millisecondsSinceEpoch;
+    int currmillishr= 0;
+    int prevmillisstr=DateTime.now().millisecondsSinceEpoch;
+    int currmillisstr= 0;
     List<double> hrlist = [];
     List<double> strlist = [];
 
@@ -87,36 +91,39 @@ class _WarningPageState2 extends State<WarningPage2> {
 
                 subscriptionhr =
                     snapshot.data![2].characteristics[2].value.listen((event) {
+                      currmillishr= DateTime.now().millisecondsSinceEpoch;
                       hrstring = ascii.decode(event).toString();
                       if(hrstring!=null) {
                         hr = int.parse(hrstring!).toDouble();
-                        // List<double> hrlistdouble=[];
-
-                        Timer.periodic(const Duration(seconds: 10), (timer) async {
-                          hrlist.add(hr);
-                        });
+                      }
+                      if(currmillishr>= prevmillishr+10000) {
+                        hrlist.add(hr);
                         // print('wrning');
                         // print('hr');
                         // print(hrlist);
+                        prevmillishr= currmillishr;
                       }
                       // subscriptionhr?.cancel();
                     });
 
                 subscriptionstress =
                     snapshot.data![2].characteristics[1].value.listen((event) {
+                      currmillisstr= DateTime.now().millisecondsSinceEpoch;
                       strstring = ascii.decode(event).toString();
                       if(strstring!=null) {
                         str = int.parse(strstring!).toDouble();
-                        // List<double> hrlistdouble=[];
-                        Timer.periodic(const Duration(seconds: 10), (timer) async {
-                          strlist.add(str);
-                        });
-                        print(strlist);
-                        // print('wrning');
-                        // print(strlist);
                       }
-                      // subscriptionhr?.cancel();
+                      if(currmillisstr>= prevmillisstr+10000) {
+                        strlist.add(str);
+                        // print('wrning');
+                        // print('stress');
+                        // print(strlist);
+                        prevmillisstr= currmillisstr;
+                      }
+                      // subscriptionstress?.cancel();
                     });
+
+
                 // print('before delay');
                 Future.delayed(const Duration(milliseconds: 21000), () async {
                   // await subscriptionhr.cancel();

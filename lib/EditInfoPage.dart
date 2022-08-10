@@ -109,7 +109,7 @@ class _EditInfoPage extends State<EditInfoPage> {
                 widget.role);
             preferences.setInt(
                 'id',
-                widget.id!);
+                widget.id);
             return false;
           },
           child: Scaffold(
@@ -354,7 +354,7 @@ class _EditInfoPage extends State<EditInfoPage> {
             widget.role);
         preferences.setInt(
             'id',
-            widget.id!);
+            widget.id);
         return false;
       },
       child: Scaffold(

@@ -190,10 +190,10 @@ class _MainPageConnected2 extends State<MainPageConnected2> {
                                       crtk +
                                       ", we will monitor the conditions and call for emergency immediately.";
 
-                                  // telephony.sendSms(
-                                  //     to: crtkcon,
-                                  //     message: emermsg
-                                  // );
+                                  telephony.sendSms(
+                                      to: crtkcon,
+                                      message: emermsg
+                                  );
                                   // print('sending message');
 
                                   snapshotblue.data![2].characteristics[0].write(utf8.encode('0'));

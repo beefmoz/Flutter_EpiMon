@@ -69,6 +69,10 @@ class _CallingPageState extends State<CallingPage> {
     String z= '';
     String gyromag= '0';
     int epi=1;
+    int prevmillishr=DateTime.now().millisecondsSinceEpoch;
+    int currmillishr= 0;
+    int prevmillisstr=DateTime.now().millisecondsSinceEpoch;
+    int currmillisstr= 0;
     List<double> hrlist= [];
     List<double> strlist = [];
     List<String> contact;
@@ -91,10 +95,16 @@ class _CallingPageState extends State<CallingPage> {
                 contactstr= contact.toString().replaceAll(",", ".");
                 VolumeController().maxVolume();
 
-                // FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
+                FlutterPhoneDirectCaller.callNumber(widget.crtkcon);
 
                 String msg= 'There is an emergency at ' + widget.loc.toString() + ', ' + widget.name + 'is having a seizure and is in need of aid. Their contact number is.' + contactstr;
                 speak(msg, epi);
+                Timer.periodic(const Duration(seconds: 15), (timer) {
+                  speak(msg, epi);
+                  if (epi == 0) {
+                    timer.cancel();
+                  }
+                });
                 if (!snapshot.hasData) {
                   // print('error: ');
                   // print(bghr.error?.toString());
@@ -114,33 +124,36 @@ class _CallingPageState extends State<CallingPage> {
 
                 subscriptionhr =
                     snapshot.data![2].characteristics[2].value.listen((event) {
+                      currmillishr= DateTime.now().millisecondsSinceEpoch;
                       hrstring = ascii.decode(event).toString();
-                      if (hrstring != null) {
+                      if(hrstring!=null) {
                         hr = int.parse(hrstring!).toDouble();
-                        // List<double> hrlistdouble=[];
-                        Timer.periodic(const Duration(seconds: 10), (timer) async {
-                          hrlist.add(hr);
-                        });
-                        // print('hr');
-                        // print('calling');
                       }
-                      // print(hrlist);
+                      if(currmillishr>= prevmillishr+10000) {
+                        hrlist.add(hr);
+                        // print('wrning');
+                        // print('hr');
+                        // print(hrlist);
+                        prevmillishr= currmillishr;
+                      }
+                      // subscriptionhr?.cancel();
                     });
-
 
                 subscriptionstress =
                     snapshot.data![2].characteristics[1].value.listen((event) {
+                      currmillisstr= DateTime.now().millisecondsSinceEpoch;
                       strstring = ascii.decode(event).toString();
                       if(strstring!=null) {
                         str = int.parse(strstring!).toDouble();
-                        // List<double> hrlistdouble=[];
-                        Timer.periodic(const Duration(seconds: 10), (timer) async {
-                          strlist.add(str);
-                        });
-                        // print('str');
-                        // print(strlist);
                       }
-                      // subscriptionhr?.cancel();
+                      if(currmillisstr>= prevmillisstr+10000) {
+                        strlist.add(str);
+                        // print('wrning');
+                        // print('stress');
+                        // print(strlist);
+                        prevmillisstr= currmillisstr;
+                      }
+                      // subscriptionstress?.cancel();
                     });
 
                 subscriptionacc =
@@ -223,7 +236,7 @@ class _CallingPageState extends State<CallingPage> {
                         title: ElevatedButton(
                             child: const Text('Patient has recovered'),
                             onPressed: () {
-                              epi = 0;
+                              epi= 0;
                               subscriptionhr!.cancel();
                               subscriptionstress!.cancel();
                               subscriptionacc!.cancel();
@@ -232,11 +245,8 @@ class _CallingPageState extends State<CallingPage> {
                               timeend = "'" + DateTime.now().toString() + "'";
                               postData(hrlist, strlist, timebegin, timeend, x, y, z, gyromag);
                               hrlist.clear();
+                              strlist.clear();
                               fluttertts.stop();
-                              subscriptionhr!.cancel();
-                              subscriptionstress!.cancel();
-                              subscriptionacc!.cancel();
-                              subscriptiongyro!.cancel();
                               showAlertDialog(context);
                             }),
                       ),
@@ -304,7 +314,6 @@ class _CallingPageState extends State<CallingPage> {
   }
 
   speak(String msg, int epi) async {
-    for (int i=0; i<2; i++) {
       FlutterTts fluttertts = new FlutterTts();
       if (epi == 1) {
         await fluttertts.speak(msg);
@@ -313,7 +322,6 @@ class _CallingPageState extends State<CallingPage> {
       else {
         fluttertts.stop();
       }
-    }
     // Future.delayed(const Duration(milliseconds:4000));
   }
   showAlertDialog(BuildContext context) {

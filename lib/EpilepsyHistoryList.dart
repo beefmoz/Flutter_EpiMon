@@ -148,7 +148,7 @@ class _HistoryPageState extends State<HistoryPage> {
               widget.role);
           preferences.setInt(
               'id',
-              widget.id!);
+              widget.id);
           return false;
         },
     child: Scaffold(
@@ -172,11 +172,6 @@ class _HistoryPageState extends State<HistoryPage> {
                         }
                         else {
                           List<History> currentPatientHistory= [];
-                          // for (int i=0; i<snapshot.data!.length; i++){
-                          //   if(widget.id==snapshot.data![i].patient_id) {
-                          //     currentPatientHistory.add(snapshot.data![i]);
-                          //   }
-                          // }
                           for (int i=snapshot.data!.length-1; i>=0; i--){
                             if(widget.id==snapshot.data![i].patient_id) {
                               currentPatientHistory.add(snapshot.data![i]);
