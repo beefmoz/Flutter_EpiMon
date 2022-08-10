@@ -477,8 +477,6 @@ class _MainPage extends State<MainPage> {
                                                               child: const Text(
                                                                   "View Patient's Epileptic History"),
                                                               onPressed: () async {
-                                                                final ble
-                                                                    .BluetoothDevice? selectedDevice =
                                                                 await Navigator.of(
                                                                     context).push(
                                                                   MaterialPageRoute(
